@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import Link from "next/link";
+import { AuthIntro } from "@/app/components/AuthIntro";
 import {
   signUpAction,
   googleLoginAction,
@@ -14,11 +15,12 @@ export default function SignupPage() {
   const [isResending, setIsResending] = useState(false);
 
   return (
-    <div className="flex min-h-screen flex-col justify-center items-center px-4 py-12 bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
-      <div className="w-full max-w-md bg-white dark:bg-zinc-900 rounded-2xl shadow-xl border border-zinc-200 dark:border-zinc-800 p-8">
+    <main className="auth-page">
+      <AuthIntro />
+      <div className="auth-card">
         
         {/* 상단 헤더 */}
-        <div className="text-center mb-8">
+        <div className="auth-heading">
           <Link href="/" className="inline-block text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">
             Developer Blog
           </Link>
@@ -28,7 +30,7 @@ export default function SignupPage() {
           <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
             {state?.success
               ? "메일함에 도착한 인증 링크를 클릭해주세요"
-              : "블로그에 가입하고 개발 이야기를 나눠보세요"}
+              : "나만의 기록 공간에서 개발 이야기를 시작하세요."}
           </p>
         </div>
 
@@ -121,7 +123,7 @@ export default function SignupPage() {
             </form>
 
             {/* 구분선 */}
-            <div className="relative flex items-center justify-center mb-6">
+            <div className="auth-divider relative flex items-center justify-center mb-6">
               <div className="border-t border-zinc-200 dark:border-zinc-800 w-full"></div>
               <span className="bg-white dark:bg-zinc-900 px-3 text-xs text-zinc-400">
                 또는 이메일로 가입
@@ -139,11 +141,10 @@ export default function SignupPage() {
             {/* 회원가입 폼 */}
             <form action={formAction} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1.5">
+                <label htmlFor="signup-name" className="block text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1.5">
                   이름
                 </label>
-                <input
-                  name="name"
+<input id="signup-name" name="name" autoComplete="name"
                   type="text"
                   required
                   placeholder="name"
@@ -152,12 +153,11 @@ export default function SignupPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1.5">
+                <label htmlFor="signup-nickname" className="block text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1.5">
                   닉네임
                 </label>
-                <div className="relative flex items-center">
-                  <input
-                    name="nickname"
+<div className="relative flex items-center">
+                  <input id="signup-nickname" name="nickname"
                     type="text"
                     required
                     placeholder="nickname"
@@ -170,11 +170,10 @@ export default function SignupPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1.5">
+                <label htmlFor="signup-email" className="block text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1.5">
                   이메일 주소
                 </label>
-                <input
-                  name="email"
+<input id="signup-email" name="email" autoComplete="email"
                   type="email"
                   required
                   placeholder="developer@example.com"
@@ -183,11 +182,10 @@ export default function SignupPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1.5">
+                <label htmlFor="signup-password" className="block text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1.5">
                   비밀번호
                 </label>
-                <input
-                  name="password"
+<input id="signup-password" name="password" autoComplete="new-password"
                   type="password"
                   required
                   placeholder="최소 6자 이상"
@@ -196,11 +194,10 @@ export default function SignupPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1.5">
+                <label htmlFor="signup-confirmPassword" className="block text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1.5">
                   비밀번호 확인
                 </label>
-                <input
-                  name="confirmPassword"
+<input id="signup-confirmPassword" name="confirmPassword"
                   type="password"
                   required
                   placeholder="비밀번호 재입력"
@@ -240,6 +237,6 @@ export default function SignupPage() {
           </>
         )}
       </div>
-    </div>
+    </main>
   );
 }

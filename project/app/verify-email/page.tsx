@@ -12,8 +12,8 @@ export default async function VerifyEmailPage({ searchParams }: VerifyEmailProps
 
   if (!token) {
     return (
-      <div className="flex min-h-screen flex-col justify-center items-center px-4 py-12 bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
-        <div className="w-full max-w-md bg-white dark:bg-zinc-900 rounded-2xl shadow-xl border border-zinc-200 dark:border-zinc-800 p-8 text-center">
+      <main className="verify-page">
+        <div className="auth-card text-center">
           <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-rose-100 dark:bg-rose-900/50 flex items-center justify-center text-rose-600 dark:text-rose-400">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -30,15 +30,15 @@ export default async function VerifyEmailPage({ searchParams }: VerifyEmailProps
             로그인으로 가기
           </Link>
         </div>
-      </div>
+      </main>
     );
   }
 
   const result = await verifyAndCreateUser(token);
 
   return (
-    <div className="flex min-h-screen flex-col justify-center items-center px-4 py-12 bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
-      <div className="w-full max-w-md bg-white dark:bg-zinc-900 rounded-2xl shadow-xl border border-zinc-200 dark:border-zinc-800 p-8 text-center">
+    <main className="verify-page">
+      <div className="auth-card text-center">
         {result.user ? (
           <>
             <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
@@ -90,6 +90,6 @@ export default async function VerifyEmailPage({ searchParams }: VerifyEmailProps
           </>
         )}
       </div>
-    </div>
+    </main>
   );
 }
