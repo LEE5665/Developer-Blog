@@ -15,6 +15,8 @@ datasource db {
 model User {
   id            String    @id @default(uuid())
   name          String?
+  nickname      String?
+  tag           String?
   email         String?   @unique
   emailVerified DateTime? @db.Timestamptz(6)
   image         String?
@@ -22,6 +24,8 @@ model User {
   createdAt     DateTime  @default(now()) @db.Timestamptz(6)
   updatedAt     DateTime  @updatedAt @db.Timestamptz(6)
   accounts      Account[]
+
+  @@unique([nickname, tag])
 }
 
 model Account {
