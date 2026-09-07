@@ -13,6 +13,9 @@
 # testing
 /coverage
 
+# Uploaded image files and ownership metadata (persist separately in production).
+/storage/uploads/
+
 # next.js
 /.next/
 /out/
