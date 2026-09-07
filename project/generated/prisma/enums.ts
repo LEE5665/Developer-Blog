@@ -9,7 +9,18 @@
 * 🟢 You can import this file directly.
 */
 
+export const Visibility = {
+  PUBLIC: 'PUBLIC',
+  PRIVATE: 'PRIVATE',
+  FRIENDS: 'FRIENDS'
+} as const
+
+export type Visibility = (typeof Visibility)[keyof typeof Visibility]
 
 
-// This file is empty because there are no enums in the schema.
-export {}
+export const FriendStatus = {
+  PENDING: 'PENDING',
+  ACCEPTED: 'ACCEPTED'
+} as const
+
+export type FriendStatus = (typeof FriendStatus)[keyof typeof FriendStatus]

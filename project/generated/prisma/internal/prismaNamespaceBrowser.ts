@@ -53,7 +53,15 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   User: 'User',
   Account: 'Account',
-  VerificationToken: 'VerificationToken'
+  VerificationToken: 'VerificationToken',
+  Category: 'Category',
+  Post: 'Post',
+  PostDraft: 'PostDraft',
+  ImageAsset: 'ImageAsset',
+  PostImage: 'PostImage',
+  DraftImage: 'DraftImage',
+  Friendship: 'Friendship',
+  Todo: 'Todo'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -113,6 +121,100 @@ export const VerificationTokenScalarFieldEnum = {
 } as const
 
 export type VerificationTokenScalarFieldEnum = (typeof VerificationTokenScalarFieldEnum)[keyof typeof VerificationTokenScalarFieldEnum]
+
+
+export const CategoryScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  isDivider: 'isDivider',
+  order: 'order',
+  userId: 'userId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CategoryScalarFieldEnum = (typeof CategoryScalarFieldEnum)[keyof typeof CategoryScalarFieldEnum]
+
+
+export const PostScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  content: 'content',
+  visibility: 'visibility',
+  authorId: 'authorId',
+  categoryId: 'categoryId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PostScalarFieldEnum = (typeof PostScalarFieldEnum)[keyof typeof PostScalarFieldEnum]
+
+
+export const PostDraftScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  key: 'key',
+  postId: 'postId',
+  title: 'title',
+  content: 'content',
+  categoryId: 'categoryId',
+  visibility: 'visibility',
+  version: 'version',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PostDraftScalarFieldEnum = (typeof PostDraftScalarFieldEnum)[keyof typeof PostDraftScalarFieldEnum]
+
+
+export const ImageAssetScalarFieldEnum = {
+  name: 'name',
+  ownerId: 'ownerId',
+  createdAt: 'createdAt',
+  orphanedAt: 'orphanedAt'
+} as const
+
+export type ImageAssetScalarFieldEnum = (typeof ImageAssetScalarFieldEnum)[keyof typeof ImageAssetScalarFieldEnum]
+
+
+export const PostImageScalarFieldEnum = {
+  postId: 'postId',
+  name: 'name'
+} as const
+
+export type PostImageScalarFieldEnum = (typeof PostImageScalarFieldEnum)[keyof typeof PostImageScalarFieldEnum]
+
+
+export const DraftImageScalarFieldEnum = {
+  draftId: 'draftId',
+  name: 'name'
+} as const
+
+export type DraftImageScalarFieldEnum = (typeof DraftImageScalarFieldEnum)[keyof typeof DraftImageScalarFieldEnum]
+
+
+export const FriendshipScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  friendId: 'friendId',
+  status: 'status',
+  createdAt: 'createdAt'
+} as const
+
+export type FriendshipScalarFieldEnum = (typeof FriendshipScalarFieldEnum)[keyof typeof FriendshipScalarFieldEnum]
+
+
+export const TodoScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  title: 'title',
+  date: 'date',
+  completed: 'completed',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TodoScalarFieldEnum = (typeof TodoScalarFieldEnum)[keyof typeof TodoScalarFieldEnum]
 
 
 export const SortOrder = {

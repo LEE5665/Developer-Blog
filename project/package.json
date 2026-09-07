@@ -12,6 +12,11 @@
     "@auth/prisma-adapter": "^2.11.3",
     "@prisma/adapter-pg": "^7.10.0",
     "@prisma/client": "^7.10.0",
+    "@tiptap/extension-image": "^3.31.3",
+    "@tiptap/extension-text-align": "^3.31.3",
+    "@tiptap/pm": "^3.31.3",
+    "@tiptap/react": "^3.31.3",
+    "@tiptap/starter-kit": "^3.31.3",
     "@types/nodemailer": "^8.0.1",
     "bcryptjs": "^3.0.3",
     "next": "16.3.4",
@@ -20,7 +25,8 @@
     "pg": "^8.23.0",
     "prisma": "^7.10.0",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "sharp": "^0.35.4"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

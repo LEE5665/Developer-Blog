@@ -32,3 +32,43 @@ export type Account = Prisma.AccountModel
  * 
  */
 export type VerificationToken = Prisma.VerificationTokenModel
+/**
+ * Model Category
+ * 
+ */
+export type Category = Prisma.CategoryModel
+/**
+ * Model Post
+ * 
+ */
+export type Post = Prisma.PostModel
+/**
+ * Model PostDraft
+ * 
+ */
+export type PostDraft = Prisma.PostDraftModel
+/**
+ * Model ImageAsset
+ * 
+ */
+export type ImageAsset = Prisma.ImageAssetModel
+/**
+ * Model PostImage
+ * 
+ */
+export type PostImage = Prisma.PostImageModel
+/**
+ * Model DraftImage
+ * 
+ */
+export type DraftImage = Prisma.DraftImageModel
+/**
+ * Model Friendship
+ * 
+ */
+export type Friendship = Prisma.FriendshipModel
+/**
+ * Model Todo
+ * 
+ */
+export type Todo = Prisma.TodoModel

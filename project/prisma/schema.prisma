@@ -25,6 +25,14 @@ model User {
   updatedAt     DateTime  @updatedAt @db.Timestamptz(6)
   accounts      Account[]
 
+  posts                  Post[]
+  drafts                 PostDraft[]
+  images                 ImageAsset[]
+  categories             Category[]
+  todos                  Todo[]
+  sentFriendRequests     Friendship[] @relation("SentFriends")
+  receivedFriendRequests Friendship[] @relation("ReceivedFriends")
+
   @@unique([nickname, tag])
 }
 
@@ -51,4 +59,130 @@ model VerificationToken {
   token      String   @unique
   expires    DateTime @db.Timestamptz(6)
   @@unique([identifier, token])
+}
+
+// 글 공개 범위
+enum Visibility {
+  PUBLIC    // 전체 공개
+  PRIVATE   // 나만 보기 (비밀글)
+  FRIENDS   // 친구 공개
+}
+
+// 네이버 블로그 스타일 카테고리
+model Category {
+  id        String   @id @default(uuid())
+  name      String   // 카테고리 이름 또는 구분선 "--"
+  isDivider Boolean  @default(false) // 구분선 여부
+  order     Int      @default(0)     // 순서 정렬
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  posts     Post[]
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  @@index([userId])
+}
+
+// 게시글 모델
+model Post {
+  id         String     @id @default(uuid())
+  title      String
+  content    String     @db.Text
+  visibility Visibility @default(PUBLIC)
+  authorId   String
+  author     User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  categoryId String?
+  category   Category?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  createdAt  DateTime   @default(now()) @db.Timestamptz(6)
+  updatedAt  DateTime   @updatedAt @db.Timestamptz(6)
+  drafts     PostDraft[]
+  images     PostImage[]
+
+  @@index([authorId])
+  @@index([categoryId])
+}
+
+model PostDraft {
+  id         String     @id @default(uuid())
+  userId     String
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  key        String
+  postId     String?
+  post       Post?      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  title      String     @default("")
+  content    String     @db.Text
+  categoryId String?
+  visibility Visibility @default(PUBLIC)
+  version    Int        @default(1)
+  createdAt  DateTime   @default(now()) @db.Timestamptz(6)
+  updatedAt  DateTime   @updatedAt @db.Timestamptz(6)
+  images     DraftImage[]
+
+  @@unique([userId, key])
+  @@index([postId])
+}
+
+model ImageAsset {
+  name       String       @id
+  ownerId    String
+  owner      User         @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  createdAt  DateTime     @default(now()) @db.Timestamptz(6)
+  orphanedAt DateTime?    @default(now()) @db.Timestamptz(6)
+  posts      PostImage[]
+  drafts     DraftImage[]
+
+  @@index([orphanedAt])
+}
+
+model PostImage {
+  postId String
+  name   String
+  post   Post       @relation(fields: [postId], references: [id], onDelete: Cascade)
+  image  ImageAsset @relation(fields: [name], references: [name], onDelete: Cascade)
+  @@id([postId, name])
+  @@index([name])
+}
+
+model DraftImage {
+  draftId String
+  name    String
+  draft   PostDraft  @relation(fields: [draftId], references: [id], onDelete: Cascade)
+  image   ImageAsset @relation(fields: [name], references: [name], onDelete: Cascade)
+  @@id([draftId, name])
+  @@index([name])
+}
+
+// 친구 관계 상태
+enum FriendStatus {
+  PENDING   // 친구 요청 중
+  ACCEPTED  // 친구 수락됨
+}
+
+// 친구 관계 모델
+model Friendship {
+  id        String       @id @default(uuid())
+  userId    String       // 요청자
+  friendId  String       // 수신자
+  status    FriendStatus @default(PENDING)
+  user      User         @relation("SentFriends", fields: [userId], references: [id], onDelete: Cascade)
+  friend    User         @relation("ReceivedFriends", fields: [friendId], references: [id], onDelete: Cascade)
+  createdAt DateTime     @default(now()) @db.Timestamptz(6)
+
+  @@unique([userId, friendId])
+  @@index([userId])
+  @@index([friendId])
+}
+
+// 캘린더 Todo 모델
+model Todo {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  date      String   // "YYYY-MM-DD" 형태
+  completed Boolean  @default(false)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  @@index([userId, date])
 }

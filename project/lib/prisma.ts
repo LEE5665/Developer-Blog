@@ -3,6 +3,8 @@ import { PrismaPg } from "@prisma/adapter-pg";
 
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL!,
+  // Prisma's timestamp transport uses UTC; do not inherit the database's local timezone.
+  options: "-c timezone=UTC",
 });
 
 const globalForPrisma = globalThis as unknown as {
