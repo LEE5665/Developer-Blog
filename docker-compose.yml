@@ -1,20 +1,16 @@
 services:
-  mariadb:
-    image: mariadb:11.4
+  postgres:
+    image: postgres:17
     ports:
-      - "3306:3306"
+      - "5432:5432"
     restart: always
     environment:
-      MARIADB_ROOT_PASSWORD: rootpass
-      MARIADB_DATABASE: developer_blog
-      MARIADB_USER: user
-      MARIADB_PASSWORD: userpass
+      POSTGRES_DB: developer_blog
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: userpass
       TZ: Asia/Seoul
-    command:
-      - --character-set-server=utf8mb4
-      - --collation-server=utf8mb4_unicode_ci
     volumes:
-      - mariadb_data:/var/lib/mysql
+      - postgres_data:/var/lib/postgresql/data
 
 volumes:
-  mariadb_data:
+  postgres_data:
