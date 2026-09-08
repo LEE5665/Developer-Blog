@@ -15,7 +15,7 @@ function renderNode(node: PostNode, key: number, context: { heading: number; pre
         if (mark.type === "underline") text = <u>{text}</u>;
         if (mark.type === "strike") text = <s>{text}</s>;
         if (mark.type === "textStyle") text = <span style={{ fontSize: String(mark.attrs?.fontSize) }}>{text}</span>;
-        if (mark.type === "highlight") text = <mark style={{ backgroundColor: String(mark.attrs?.color), color: "#202631" }}>{text}</mark>;
+        if (mark.type === "highlight") text = <mark style={{ backgroundColor: String(mark.attrs?.color) }}>{text}</mark>;
         if (mark.type === "code") text = <code>{text}</code>;
         if (mark.type === "link") text = <a href={String(mark.attrs?.href)} target="_blank" rel="noopener noreferrer nofollow">{text}</a>;
       }
@@ -35,7 +35,10 @@ function renderNode(node: PostNode, key: number, context: { heading: number; pre
     case "hardBreak": return <br key={key} />;
     // User-supplied remote and embedded images cannot use a fixed Next image host list.
     // eslint-disable-next-line @next/next/no-img-element
-    case "image": return <img key={key} src={String(node.attrs?.src)} alt={String(node.attrs?.alt || "")} title={node.attrs?.title ? String(node.attrs.title) : undefined} loading="lazy" referrerPolicy="no-referrer" />;
+    case "image": {
+      const width = node.attrs?.width ? String(node.attrs.width) : undefined;
+      return <img key={key} src={String(node.attrs?.src)} alt={String(node.attrs?.alt || "")} title={node.attrs?.title ? String(node.attrs.title) : undefined} style={width ? { width } : undefined} loading="lazy" referrerPolicy="no-referrer" />;
+    }
     default: return <Fragment key={key}>{children}</Fragment>;
   }
 }

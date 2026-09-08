@@ -4,6 +4,18 @@ import { FONT_SIZES, HIGHLIGHT_COLORS } from "@/lib/post-content";
 import type { Editor } from "@tiptap/react";
 import { Icon } from "@/app/components/Icon";
 
+const HIGHLIGHT_NAMES: Record<string, string> = {
+  "#fef08a": "노랑",
+  "#fed7aa": "주황",
+  "#bbf7d0": "초록",
+  "#99f6e4": "민트",
+  "#bfdbfe": "파랑",
+  "#ddd6fe": "보라",
+  "#fbcfe8": "분홍",
+  "#fecaca": "빨강",
+  "#e2e8f0": "회색",
+};
+
 interface Props {
   editor: Editor | null;
   onLink: () => void;
@@ -24,7 +36,7 @@ export function EditorToolbar({ editor, onLink, onImage }: Props) {
       </div>
       <div className="toolbar-group">
         <select aria-label="글자 크기" disabled={!editor} value={editor?.getAttributes("textStyle").fontSize || ""} onChange={(event) => { if (event.target.value) editor?.chain().focus().setFontSize(event.target.value).run(); else editor?.chain().focus().unsetFontSize().run(); }}><option value="">기본 크기</option>{FONT_SIZES.map((size) => <option key={size} value={size}>{size.replace("px", "")} px</option>)}</select>
-        <select aria-label="글자 배경색" disabled={!editor} value={editor?.getAttributes("highlight").color || ""} onChange={(event) => { if (event.target.value) editor?.chain().focus().setHighlight({ color: event.target.value }).run(); else editor?.chain().focus().unsetHighlight().run(); }}><option value="">배경색 없음</option>{HIGHLIGHT_COLORS.map((color, index) => <option key={color} value={color}>{["노랑", "초록", "파랑", "분홍", "보라"][index]}</option>)}</select>
+        <select aria-label="글자 배경색" disabled={!editor} value={editor?.getAttributes("highlight").color || ""} onChange={(event) => { if (event.target.value) editor?.chain().focus().setHighlight({ color: event.target.value }).run(); else editor?.chain().focus().unsetHighlight().run(); }}><option value="">배경색 없음</option>{HIGHLIGHT_COLORS.map((color) => <option key={color} value={color}>{HIGHLIGHT_NAMES[color] || color}</option>)}</select>
       </div>
       <div className="toolbar-group">
         {tool("굵게 (Ctrl+B)", <b>B</b>, () => editor?.chain().focus().toggleBold().run(), editor?.isActive("bold"))}

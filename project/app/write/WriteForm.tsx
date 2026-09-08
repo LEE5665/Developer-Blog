@@ -1,9 +1,9 @@
-﻿"use client";
+"use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { EditorContent, useEditor, useEditorState, type JSONContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import ImageExtension from "@tiptap/extension-image";
+import { ResizableImage } from "./ResizableImage";
 import Placeholder from "@tiptap/extension-placeholder";
 import { TextStyle, FontSize } from "@tiptap/extension-text-style";
 import Highlight from "@tiptap/extension-highlight";
@@ -62,7 +62,7 @@ export function WriteForm({ categories, userId, initialPost }: { categories: Cat
       StarterKit.configure({ heading: { levels: [2, 3, 4] }, link: { openOnClick: false, defaultProtocol: "https", protocols: ["http", "https", "mailto"] } }),
       TextStyle, FontSize, Highlight.configure({ multicolor: true }),
       Placeholder.configure({ placeholder: "이곳에 당신의 이야기를 들려주세요." }),
-      ImageExtension.configure({ allowBase64: false }),
+      ResizableImage.configure({ allowBase64: false }),
       TextAlign.configure({ types: ["heading", "paragraph"] }),
     ],
     immediatelyRender: false,
@@ -273,7 +273,7 @@ export function WriteForm({ categories, userId, initialPost }: { categories: Cat
           <div className="modal-actions">{insertMode === "link" && editor?.isActive("link") && <button type="button" className="button button-secondary" onClick={() => { editor.chain().focus().extendMarkRange("link").unsetLink().run(); setInsertMode(null); }}>링크 제거</button>}<button type="submit" className="button button-accent" disabled={imageBusy}>삽입하기</button></div>
         </form>
       </Modal>
-      <Modal open={publishOpen} onClose={() => { if (!loading) setPublishOpen(false); }} title={initialPost ? "수정 완료" : "글 발행하기"}>
+      <Modal open={publishOpen} onClose={() => { if (!loading) setPublishOpen(false); }} title={initialPost ? "수정 완료" : "글 쓰기"}>
         <form onSubmit={publish} className="modal-form">
           <div className="publish-summary"><span>발행할 글</span><strong>{title}</strong></div>
           <label htmlFor="publish-category">카테고리</label><select id="publish-category" value={categoryId} disabled={loading} onChange={(event) => { setCategoryId(event.target.value); changed(); }}><option value="none">미분류</option>{categories.filter((category) => !category.isDivider).map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}</select>

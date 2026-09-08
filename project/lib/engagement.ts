@@ -10,8 +10,24 @@ export async function readablePost(id: string, viewerId?: string) {
 }
 export function checkMutation(request: Request) {
   const origin = request.headers.get("origin");
-  const expected = new URL(process.env.AUTH_URL || request.url).origin;
-  if ((origin && origin !== expected) || request.headers.get("sec-fetch-site") === "cross-site") throw new PostError("허용되지 않은 요청입니다.", 403);
+  const host = request.headers.get("x-forwarded-host") || request.headers.get("host");
+  const secFetchSite = request.headers.get("sec-fetch-site");
+  if (origin) {
+    let originHost: string | null = null;
+    try {
+      originHost = new URL(origin).host;
+    } catch {
+      throw new PostError("허용되지 않은 요청입니다.", 403);
+    }
+    const urlHost = new URL(request.url).host;
+    const authUrlHost = process.env.AUTH_URL ? new URL(process.env.AUTH_URL).host : null;
+    const isSameHost = (host && originHost === host) || originHost === urlHost || (authUrlHost && originHost === authUrlHost);
+    if (!isSameHost) {
+      throw new PostError("허용되지 않은 요청입니다.", 403);
+    }
+  } else if (secFetchSite === "cross-site") {
+    throw new PostError("허용되지 않은 요청입니다.", 403);
+  }
   if (!request.headers.get("content-type")?.startsWith("application/json")) throw new PostError("JSON 요청이 필요합니다.", 415);
 }
 export function fingerprint(value: string) {

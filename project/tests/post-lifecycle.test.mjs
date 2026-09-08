@@ -148,11 +148,11 @@ test('post, draft, permission, category and image lifecycle', { timeout: 120000 
     likedPage=await (await fetch(base+'/mypage?tab=likes',{headers:{cookie:otherCookie}})).text();
     assert.ok(!likedPage.includes('Public lifecycle post'));
 
-    let created=await call(engagementUrl+'/comments','POST',{content:'<script>not executable</script>',anonymous:true,nickname:'익명 독자',password:'comment-secret',authorId:owner},ownerCookie);
+    let created=await call(engagementUrl+'/comments','POST',{content:'<script>not executable</script>',anonymous:true,nickname:'익명 독자',password:'comment-secret',authorId:owner},null);
     assert.equal(created.status,201,JSON.stringify(created));
     const anonId=created.body.comment.id;
     const storedComment=(await db.query('SELECT * FROM "Comment" WHERE id=$1',[anonId])).rows[0];
-    assert.equal(storedComment.authorId,null,'logged in anonymous comment has no account link');
+    assert.equal(storedComment.authorId,null,'guest comment has no account link');
     assert.notEqual(storedComment.passwordHash,'comment-secret');
     stats=(await call(engagementUrl+'/engagement','GET',undefined,null)).body;
     const anon=stats.comments.find(item=>item.id===anonId);
@@ -163,11 +163,11 @@ test('post, draft, permission, category and image lifecycle', { timeout: 120000 
     assert.equal((await call(engagementUrl+'/comments/'+anonId,'PATCH',{content:'Edited anonymously',password:'comment-secret'},null)).status,200);
     assert.equal((await call(engagementUrl+'/comments/'+anonId,'DELETE',{password:'wrong'},null)).status,403);
     assert.equal((await call(engagementUrl+'/comments/'+anonId,'DELETE',{password:'comment-secret'},null)).status,200);
-    created=await call(engagementUrl+'/comments','POST',{content:'Account comment',nickname:'Spoofed nickname',authorId:other},ownerCookie);
+    created=await call(engagementUrl+'/comments','POST',{content:'Account comment',anonymous:true,nickname:'Spoofed nickname',authorId:other},ownerCookie);
     assert.equal(created.status,201); const memberId=created.body.comment.id;
     stats=(await call(engagementUrl+'/engagement','GET',undefined,null)).body;
     const member=stats.comments.find(item=>item.id===memberId);
-    assert.equal(member.authorId,owner); assert.equal(member.image,'https://example.com/lifecycle-avatar.png'); assert.notEqual(member.nickname,'Spoofed nickname');
+    assert.equal(member.authorId,owner); assert.equal(member.anonymous,false,'signed-in users cannot request anonymous authorship'); assert.equal(member.image,'https://example.com/lifecycle-avatar.png'); assert.notEqual(member.nickname,'Spoofed nickname');
     assert.equal((await call(engagementUrl+'/comments/'+memberId,'PATCH',{content:'Not mine'},otherCookie)).status,403);
     assert.equal((await call(engagementUrl+'/comments/'+memberId,'DELETE',{},otherCookie)).status,403);
     assert.equal((await call(engagementUrl+'/comments/'+memberId,'PATCH',{content:'Updated by account'},ownerCookie)).status,200);
@@ -195,7 +195,8 @@ test('post, draft, permission, category and image lifecycle', { timeout: 120000 
     await db.query('INSERT INTO "PostView" ("postId","viewerHash",day,"createdAt") VALUES ($1,$2,$3,NOW()-INTERVAL \'8 days\')',[post.id,'old-reader','2000-01-01']);
     await db.query('INSERT INTO "PostView" ("postId","viewerHash",day) VALUES ($1,$2,$3)',[shared.body.post.id,'private-reader','2000-01-01']);
     const home=await (await fetch(base)).text();
-    assert.ok(home.includes('이번 주 많이 읽은 글'));
+    assert.ok(home.includes('많이 읽은 글'));
+    assert.ok(home.includes('인기 글 조회 기간'));
     const ranking=home.slice(home.indexOf('<section class="weekly-popular"'),home.indexOf('</ol>',home.indexOf('<section class="weekly-popular"')));
     assert.ok(ranking.includes('Public lifecycle post'));
     assert.ok(/조회 (?:<!-- -->)?2/.test(ranking),'weekly count excludes eight day old views');

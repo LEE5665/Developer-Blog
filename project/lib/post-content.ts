@@ -1,6 +1,16 @@
 export const RICH_CONTENT_PREFIX = "DB_RICH_TEXT_V1:";
 export const FONT_SIZES = ["12px", "14px", "16px", "18px", "20px", "24px", "28px", "32px", "40px"] as const;
-export const HIGHLIGHT_COLORS = ["#fef08a", "#bbf7d0", "#bfdbfe", "#fbcfe8", "#ddd6fe"] as const;
+export const HIGHLIGHT_COLORS = [
+  "#fef08a",
+  "#fed7aa",
+  "#bbf7d0",
+  "#99f6e4",
+  "#bfdbfe",
+  "#ddd6fe",
+  "#fbcfe8",
+  "#fecaca",
+  "#e2e8f0",
+] as const;
 export const MAX_CONTENT_LENGTH = 5_000_000;
 
 export interface PostNode {
@@ -26,6 +36,17 @@ export function safeImage(value: unknown): string | null {
   return url && /^https?:/.test(url) ? url : null;
 }
 
+export function safeWidth(value: unknown): string | null {
+  if (typeof value !== "string" && typeof value !== "number") return null;
+  const str = String(value).trim();
+  if (/^([1-9][0-9]?|100)%$/.test(str)) return str;
+  if (/^([1-9][0-9]{1,3})px$/.test(str)) {
+    const px = parseInt(str, 10);
+    if (px >= 50 && px <= 1600) return `${px}px`;
+  }
+  return null;
+}
+
 const types = new Set(["doc", "paragraph", "heading", "text", "bulletList", "orderedList", "listItem", "blockquote", "codeBlock", "horizontalRule", "hardBreak", "image"]);
 const markTypes = new Set(["bold", "italic", "underline", "strike", "code", "link", "textStyle", "highlight"]);
 
@@ -49,7 +70,13 @@ export function normalizeDocument(input: unknown, allowLegacyImages = false): Po
     if (node.type === "image") {
       const src = safeImage(attrs.src) || (allowLegacyImages && typeof attrs.src === "string" && /^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/.test(attrs.src) ? attrs.src : null);
       if (!src) throw new Error("이미지 주소를 확인해주세요.");
-      result.attrs = { src, alt: typeof attrs.alt === "string" ? attrs.alt.slice(0, 300) : "", title: typeof attrs.title === "string" ? attrs.title.slice(0, 300) : null };
+      const width = safeWidth(attrs.width);
+      result.attrs = {
+        src,
+        alt: typeof attrs.alt === "string" ? attrs.alt.slice(0, 300) : "",
+        title: typeof attrs.title === "string" ? attrs.title.slice(0, 300) : null,
+        ...(width ? { width } : {}),
+      };
     }
     if (Array.isArray(node.marks)) {
       result.marks = node.marks.slice(0, 10).flatMap<NonNullable<PostNode["marks"]>[number]>((mark) => {

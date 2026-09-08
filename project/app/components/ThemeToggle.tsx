@@ -38,10 +38,12 @@ export function ThemeToggle() {
       if (event.key === storageKey || event.key === null) sync();
     };
     sync();
-    media.addEventListener("change", onSystemChange);
+    if (typeof media.addEventListener === "function") media.addEventListener("change", onSystemChange);
+    else media.addListener(onSystemChange);
     window.addEventListener("storage", onStorage);
     return () => {
-      media.removeEventListener("change", onSystemChange);
+      if (typeof media.removeEventListener === "function") media.removeEventListener("change", onSystemChange);
+      else media.removeListener(onSystemChange);
       window.removeEventListener("storage", onStorage);
     };
   }, []);

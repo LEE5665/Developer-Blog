@@ -19,7 +19,6 @@ export function PostEngagement({ postId }: { postId: string }) {
   const [data, setData] = useState<Engagement | null>(null);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
-  const [anonymous, setAnonymous] = useState(false);
   const [nickname, setNickname] = useState("");
   const [password, setPassword] = useState("");
   const [content, setContent] = useState("");
@@ -35,8 +34,10 @@ export function PostEngagement({ postId }: { postId: string }) {
         const result: Engagement = await requestJson(base + "/engagement");
         if (cancelled) return;
         setData(result);
-        const viewed = await requestJson(base + "/views", { method: "POST", headers: jsonHeaders, body: "{}" });
-        if (!cancelled) setData((current) => current ? { ...current, views: viewed.views } : current);
+        try {
+          const viewed = await requestJson(base + "/views", { method: "POST", headers: jsonHeaders, body: "{}" });
+          if (!cancelled) setData((current) => current ? { ...current, views: viewed.views } : current);
+        } catch { /* Views tracking failure should not suppress comments. */ }
       } catch (error) { if (!cancelled) setError(error instanceof Error ? error.message : "댓글을 불러오지 못했습니다."); }
     }
     void load();
@@ -57,7 +58,7 @@ export function PostEngagement({ postId }: { postId: string }) {
     event.preventDefault(); if (busy) return;
     setBusy(true); setError(""); setNotice("");
     try {
-      await requestJson(base + "/comments", { method: "POST", headers: jsonHeaders, body: JSON.stringify({ content, anonymous: !data?.loggedIn || anonymous, nickname, password }) });
+      await requestJson(base + "/comments", { method: "POST", headers: jsonHeaders, body: JSON.stringify({ content, nickname, password }) });
       setContent(""); setPassword(""); setNotice("댓글이 등록되었습니다."); await reload();
     } catch (error) { setError(error instanceof Error ? error.message : "댓글을 등록하지 못했습니다."); }
     finally { setBusy(false); }
@@ -73,12 +74,11 @@ export function PostEngagement({ postId }: { postId: string }) {
     } catch (error) { setActionError(error instanceof Error ? error.message : "댓글을 변경하지 못했습니다."); }
     finally { setBusy(false); }
   }
-  const isAnonymous = !data?.loggedIn || anonymous;
+  const isAnonymous = !data?.loggedIn;
   return <section className="post-engagement" aria-label="좋아요와 댓글">
     <div className="engagement-summary">{data?.loggedIn ? <button type="button" className="button button-secondary like-button" aria-pressed={data.liked} disabled={busy} onClick={like}><Heart filled={data.liked} />좋아요 {data.likes}</button> : <Link href="/login" className="button button-secondary" aria-label="로그인하고 좋아요"><Heart filled={false} />좋아요 {data?.likes || 0}</Link>}<span>조회 {data?.views ?? "—"}</span></div>
     <h2 className="comments-heading">댓글 <span>{data?.totalComments ?? 0}</span></h2>
     {data && <form className="comment-form" onSubmit={submit}>
-      {data.loggedIn && <label className="comment-anonymous-toggle"><input type="checkbox" checked={anonymous} disabled={busy} onChange={(event) => setAnonymous(event.target.checked)} />익명으로 작성</label>}
       {isAnonymous && <><div className="comment-credentials"><input aria-label="댓글 닉네임" placeholder="닉네임" required minLength={2} maxLength={30} value={nickname} disabled={busy} onChange={(event) => setNickname(event.target.value)} /><input type="password" aria-label="댓글 비밀번호" placeholder="비밀번호 (4자 이상)" required minLength={4} maxLength={72} autoComplete="new-password" value={password} disabled={busy} onChange={(event) => setPassword(event.target.value)} /></div><p className="comment-hint">프로필 없이 닉네임만 표시됩니다. 수정·삭제할 때 이 비밀번호가 필요합니다.</p></>}
       <textarea aria-label="댓글 내용" placeholder="이 글에 대한 생각을 남겨주세요." required maxLength={2000} rows={4} value={content} disabled={busy} onChange={(event) => setContent(event.target.value)} />
       <div className="comment-form-footer"><small>{content.length}/2,000</small><button type="submit" className="button button-accent" disabled={busy || !content.trim()}>댓글 등록</button></div>

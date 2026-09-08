@@ -5,7 +5,12 @@ import { PostError, postFailure } from "@/lib/post-service";
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const userId = (await auth())?.user?.id;
+    let userId: string | undefined;
+    try {
+      userId = (await auth())?.user?.id;
+    } catch {
+      userId = undefined;
+    }
     const post = await readablePost(id, userId);
     const cursor = new URL(request.url).searchParams.get("cursor");
     const cursorComment = cursor ? await prisma.comment.findFirst({ where: { id: cursor, postId: id }, select: { createdAt: true, id: true } }) : null;

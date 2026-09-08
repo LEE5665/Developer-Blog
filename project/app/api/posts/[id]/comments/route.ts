@@ -10,7 +10,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     const userId = (await auth())?.user?.id;
     await readablePost(id, userId);
     const body = await request.json();
-    const anonymous = !userId || body.anonymous === true;
+    const anonymous = !userId;
     const content = commentContent(body.content);
     let nickname: string;
     let passwordHash: string | null = null;

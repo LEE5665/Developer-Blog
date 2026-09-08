@@ -8,7 +8,12 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   try {
     checkMutation(request);
     const { id } = await params;
-    const userId = (await auth())?.user?.id;
+    let userId: string | undefined;
+    try {
+      userId = (await auth())?.user?.id;
+    } catch {
+      userId = undefined;
+    }
     const post = await readablePost(id, userId);
     if (userId !== post.authorId) {
       let identity = "user:" + userId;
