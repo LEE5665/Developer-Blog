@@ -4,6 +4,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { EditorContent, useEditor, useEditorState, type JSONContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import ImageExtension from "@tiptap/extension-image";
+import Placeholder from "@tiptap/extension-placeholder";
+import { TextStyle, FontSize } from "@tiptap/extension-text-style";
+import Highlight from "@tiptap/extension-highlight";
+import { TagInput } from "./TagInput";
 import TextAlign from "@tiptap/extension-text-align";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -15,8 +19,8 @@ import { EditorToolbar } from "./EditorToolbar";
 
 type Visibility = "PUBLIC" | "FRIENDS" | "PRIVATE";
 interface CategoryOption { id: string; name: string; isDivider: boolean }
-interface Draft { title: string; doc: JSONContent; categoryId: string; visibility: Visibility; savedAt: string; version?: number }
-interface EditablePost { id: string; title: string; content: string; categoryId: string | null; visibility: Visibility; updatedAt: string }
+interface Draft { tags: string[]; title: string; doc: JSONContent; categoryId: string; visibility: Visibility; savedAt: string; version?: number }
+interface EditablePost { tags: string[]; id: string; title: string; content: string; categoryId: string | null; visibility: Visibility; updatedAt: string }
 const emptyDocument: JSONContent = { type: "doc", content: [{ type: "paragraph" }] };
 
 export function WriteForm({ categories, userId, initialPost }: { categories: CategoryOption[]; userId: string; initialPost?: EditablePost }) {
@@ -26,6 +30,7 @@ export function WriteForm({ categories, userId, initialPost }: { categories: Cat
   const initialDocument = initialPost ? readDocument(initialPost.content) || { type: "doc", content: initialPost.content.split("\n").map((text) => ({ type: "paragraph", content: text ? [{ type: "text", text }] : [] })) } : emptyDocument;
   const [showToc, setShowToc] = useState(initialPost ? readDocument(initialPost.content)?.attrs?.toc !== "hidden" : true);
   const [tocDepth, setTocDepth] = useState(Number(initialPost ? readDocument(initialPost.content)?.attrs?.tocDepth || 4 : 4));
+  const [tags, setTags] = useState<string[]>(initialPost?.tags || []);
   const [title, setTitle] = useState(initialPost?.title || "");
   const [categoryId, setCategoryId] = useState(initialPost?.categoryId || "none");
   const [visibility, setVisibility] = useState<Visibility>(initialPost?.visibility || "PUBLIC");
@@ -55,16 +60,18 @@ export function WriteForm({ categories, userId, initialPost }: { categories: Cat
   const editor = useEditor({
     extensions: [
       StarterKit.configure({ heading: { levels: [2, 3, 4] }, link: { openOnClick: false, defaultProtocol: "https", protocols: ["http", "https", "mailto"] } }),
+      TextStyle, FontSize, Highlight.configure({ multicolor: true }),
+      Placeholder.configure({ placeholder: "이곳에 당신의 이야기를 들려주세요." }),
       ImageExtension.configure({ allowBase64: false }),
       TextAlign.configure({ types: ["heading", "paragraph"] }),
     ],
     immediatelyRender: false,
     content: initialDocument,
-    editorProps: { attributes: { class: "rich-prose composer-body", role: "textbox", "aria-label": "글 본문", "aria-multiline": "true", "data-placeholder": "이곳에 당신의 이야기를 들려주세요." } },
+    editorProps: { attributes: { class: "rich-prose composer-body", role: "textbox", "aria-label": "글 본문", "aria-multiline": "true" } },
     onUpdate: () => { dirty.current = true; revisionRef.current += 1; setRevision((value) => value + 1); },
   });
   // Keep toolbar state in sync with the caret and undo history, not just typing.
-  const editorState = useEditorState({ editor, selector: ({ editor }) => ({ transaction: editor?.state, count: editor?.getText().length || 0, empty: editor?.isEmpty ?? true }) });
+  const editorState = useEditorState({ editor, selector: ({ editor }) => ({ transaction: editor?.state, count: editor?.getText().length || 0 }) });
 
   useEffect(() => {
     let cancelled = false;
@@ -75,7 +82,7 @@ export function WriteForm({ categories, userId, initialPost }: { categories: Cat
         if (cancelled) return;
         const draft = result.draft;
         draftVersion.current = draft?.version ?? null;
-        if (draft) setStoredDraft({ title: draft.title, doc: normalizeDocument(readDocument(draft.content)), categoryId: draft.categoryId || "none", visibility: draft.visibility, savedAt: draft.updatedAt, version: draft.version });
+        if (draft) setStoredDraft({ tags: draft.tags || [], title: draft.title, doc: normalizeDocument(readDocument(draft.content)), categoryId: draft.categoryId || "none", visibility: draft.visibility, savedAt: draft.updatedAt, version: draft.version });
         else {
           // Recover pre-existing browser drafts, then migrate them on the next save.
           try {
@@ -97,13 +104,13 @@ export function WriteForm({ categories, userId, initialPost }: { categories: Cat
   const saveDraft = useCallback((): Promise<boolean> => {
     if (!editor || !draftReady || storedDraft || published.current || savingPaused.current || draftConflict.current) return Promise.resolve(false);
     const versionAtSave = revisionRef.current;
-    const snapshot: Draft = { title, doc: { ...editor.getJSON(), attrs: { toc: showToc ? "shown" : "hidden", tocDepth } }, categoryId, visibility, savedAt: new Date().toISOString() };
+    const snapshot: Draft = { tags, title, doc: { ...editor.getJSON(), attrs: { toc: showToc ? "shown" : "hidden", tocDepth } }, categoryId, visibility, savedAt: new Date().toISOString() };
     try { localStorage.setItem(storageKey, JSON.stringify(snapshot)); } catch { /* Server persistence remains available. */ }
     pendingSave.current = pendingSave.current.then(async () => {
       if (published.current || draftConflict.current) return false;
       setDraftMessage("서버에 임시저장 중...");
       try {
-        const response = await fetch("/api/drafts", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ key: draftKey, title: snapshot.title, content: serializeDocument(snapshot.doc), categoryId: snapshot.categoryId, visibility: snapshot.visibility, version: draftVersion.current }) });
+        const response = await fetch("/api/drafts", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ key: draftKey, title: snapshot.title, tags: snapshot.tags, content: serializeDocument(snapshot.doc), categoryId: snapshot.categoryId, visibility: snapshot.visibility, version: draftVersion.current }) });
         const result = await response.json();
         if (!response.ok) { if (response.status === 409) draftConflict.current = true; throw new Error(result.error || "임시저장에 실패했습니다."); }
         draftVersion.current = result.draft.version;
@@ -113,7 +120,7 @@ export function WriteForm({ categories, userId, initialPost }: { categories: Cat
       } catch (error) { setDraftMessage(error instanceof Error ? error.message : "임시저장 실패 · 창을 닫지 마세요"); return false; }
     });
     return pendingSave.current;
-  }, [editor, draftReady, storedDraft, title, categoryId, visibility, storageKey, draftKey, showToc, tocDepth]);
+  }, [editor, draftReady, storedDraft, title, categoryId, visibility, storageKey, draftKey, showToc, tocDepth, tags]);
 
   useEffect(() => {
     if (!dirty.current || storedDraft || !draftReady) return;
@@ -133,6 +140,7 @@ export function WriteForm({ categories, userId, initialPost }: { categories: Cat
   function restoreDraft() {
     if (!storedDraft || !editor) return;
     setTitle(storedDraft.title);
+    setTags(storedDraft.tags || []);
     setCategoryId(categories.some((category) => category.id === storedDraft.categoryId && !category.isDivider) ? storedDraft.categoryId : "none");
     setVisibility(storedDraft.visibility);
     setShowToc(storedDraft.doc.attrs?.toc !== "hidden");
@@ -153,6 +161,7 @@ export function WriteForm({ categories, userId, initialPost }: { categories: Cat
       draftVersion.current = null; draftConflict.current = false; dirty.current = false;
       try { localStorage.removeItem(storageKey); } catch { /* Server draft was removed. */ }
       setStoredDraft(null);
+      setTags(initialPost?.tags || []);
       setTitle(initialPost?.title || ""); setCategoryId(initialPost?.categoryId || "none"); setVisibility(initialPost?.visibility || "PUBLIC");
       setShowToc(initialPost ? readDocument(initialPost.content)?.attrs?.toc !== "hidden" : true);
       setTocDepth(Number(initialPost ? readDocument(initialPost.content)?.attrs?.tocDepth || 4 : 4));
@@ -206,7 +215,7 @@ export function WriteForm({ categories, userId, initialPost }: { categories: Cat
     setLoading(true); setError(null); savingPaused.current = true;
     await pendingSave.current;
     try {
-      const res = await fetch(initialPost ? `/api/posts/${initialPost.id}` : "/api/posts", { method: initialPost ? "PATCH" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title, draftVersion: draftVersion.current, updatedAt: initialPost?.updatedAt, content: serializeDocument({ ...editor.getJSON(), attrs: { toc: showToc ? "shown" : "hidden", tocDepth } }), categoryId: categoryId === "none" ? null : categoryId, visibility }) });
+      const res = await fetch(initialPost ? `/api/posts/${initialPost.id}` : "/api/posts", { method: initialPost ? "PATCH" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title, tags, draftVersion: draftVersion.current, updatedAt: initialPost?.updatedAt, content: serializeDocument({ ...editor.getJSON(), attrs: { toc: showToc ? "shown" : "hidden", tocDepth } }), categoryId: categoryId === "none" ? null : categoryId, visibility }) });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "글을 발행하지 못했습니다.");
       published.current = true; dirty.current = false;
@@ -232,6 +241,7 @@ export function WriteForm({ categories, userId, initialPost }: { categories: Cat
         <div className="composer-paper">
           <div className="composer-category"><Icon name="folder" width={15} height={15} /><label className="sr-only" htmlFor="composer-category">카테고리 선택</label><select id="composer-category" disabled={!draftReady || !!storedDraft || loading} value={categoryId} onChange={(event) => { setCategoryId(event.target.value); changed(); }}><option value="none">카테고리 선택</option>{categories.filter((category) => !category.isDivider).map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}</select></div>
           <input ref={titleInput} aria-label="글 제목" className="composer-title" placeholder="제목을 입력하세요" value={title} maxLength={200} disabled={!draftReady || !!storedDraft || loading} onChange={(event) => { setTitle(event.target.value); changed(); }} />
+          <TagInput tags={tags} disabled={!draftReady || !!storedDraft || loading} onChange={(value) => { setTags(value); changed(); }} />
           <div className="composer-byline">나만의 경험이 담긴 한 편의 글을 완성해보세요.</div>
           {showToc && <details className="editor-outline"><summary>목차 미리보기 · {documentOutline(editor?.getJSON() || null, "editor", tocDepth).length}개 제목</summary><ol>{documentOutline(editor?.getJSON() || null, "editor", tocDepth).map((item) => <li key={item.id} style={{ paddingLeft: (item.level - 2) * 12 }}><button type="button" onClick={() => {
             let index = 0;
@@ -241,7 +251,6 @@ export function WriteForm({ categories, userId, initialPost }: { categories: Cat
           }}>{item.text}</button></li>)}</ol><p>목차의 제목을 누르면 해당 위치를 편집할 수 있습니다.</p></details>}
           {error && !publishOpen && <p role="alert" className="composer-error">{error}</p>}
           <div className="composer-editor-wrap" inert={!draftReady || !!storedDraft || loading}>
-            {editorState?.empty && <span className="composer-placeholder" aria-hidden="true">이곳에 당신의 이야기를 들려주세요.</span>}
             <EditorContent editor={editor} />
             {!editor && <p className="text-muted py-8 text-sm">편집기를 준비하고 있습니다...</p>}
           </div>

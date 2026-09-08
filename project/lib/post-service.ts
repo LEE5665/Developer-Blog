@@ -53,8 +53,11 @@ export async function validatePost(tx: Transaction, input: Record<string, unknow
   if (categoryId !== null && (typeof categoryId !== "string" || !await tx.category.findFirst({ where: { id: categoryId, userId, isDivider: false } }))) throw new PostError("카테고리가 삭제되었거나 사용할 수 없습니다. 다시 선택해주세요.");
   const visibility = input.visibility;
   if (visibility !== "PUBLIC" && visibility !== "FRIENDS" && visibility !== "PRIVATE") throw new PostError("공개 범위를 확인해주세요.");
+  const rawTags = input.tags ?? [];
+  if (!Array.isArray(rawTags) || rawTags.length > 10 || rawTags.some((tag) => typeof tag !== "string" || !tag.trim() || tag.trim().length > 24)) throw new PostError("태그는 24자 이내로 최대 10개까지 추가할 수 있습니다.");
+  const tags = [...new Set((rawTags as string[]).map((tag) => tag.trim().replace(/^#+/, "")).filter(Boolean))];
   const names = await ensureImages(tx, content, userId);
-  return { data: { title, content, categoryId: categoryId as string | null, visibility: visibility as "PUBLIC" | "FRIENDS" | "PRIVATE" }, names };
+  return { data: { title, content, tags, categoryId: categoryId as string | null, visibility: visibility as "PUBLIC" | "FRIENDS" | "PRIVATE" }, names };
 }
 
 export async function consumeDraft(tx: Transaction, userId: string, key: string, version: unknown) {

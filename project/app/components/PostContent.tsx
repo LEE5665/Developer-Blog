@@ -14,6 +14,8 @@ function renderNode(node: PostNode, key: number, context: { heading: number; pre
         if (mark.type === "italic") text = <em>{text}</em>;
         if (mark.type === "underline") text = <u>{text}</u>;
         if (mark.type === "strike") text = <s>{text}</s>;
+        if (mark.type === "textStyle") text = <span style={{ fontSize: String(mark.attrs?.fontSize) }}>{text}</span>;
+        if (mark.type === "highlight") text = <mark style={{ backgroundColor: String(mark.attrs?.color), color: "#202631" }}>{text}</mark>;
         if (mark.type === "code") text = <code>{text}</code>;
         if (mark.type === "link") text = <a href={String(mark.attrs?.href)} target="_blank" rel="noopener noreferrer nofollow">{text}</a>;
       }

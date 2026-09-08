@@ -1,4 +1,6 @@
 export const RICH_CONTENT_PREFIX = "DB_RICH_TEXT_V1:";
+export const FONT_SIZES = ["12px", "14px", "16px", "18px", "20px", "24px", "28px", "32px", "40px"] as const;
+export const HIGHLIGHT_COLORS = ["#fef08a", "#bbf7d0", "#bfdbfe", "#fbcfe8", "#ddd6fe"] as const;
 export const MAX_CONTENT_LENGTH = 5_000_000;
 
 export interface PostNode {
@@ -25,7 +27,7 @@ export function safeImage(value: unknown): string | null {
 }
 
 const types = new Set(["doc", "paragraph", "heading", "text", "bulletList", "orderedList", "listItem", "blockquote", "codeBlock", "horizontalRule", "hardBreak", "image"]);
-const markTypes = new Set(["bold", "italic", "underline", "strike", "code", "link"]);
+const markTypes = new Set(["bold", "italic", "underline", "strike", "code", "link", "textStyle", "highlight"]);
 
 // Both the API and the React renderer use the same bounded, allowlisted format.
 export function normalizeDocument(input: unknown, allowLegacyImages = false): PostNode {
@@ -50,12 +52,14 @@ export function normalizeDocument(input: unknown, allowLegacyImages = false): Po
       result.attrs = { src, alt: typeof attrs.alt === "string" ? attrs.alt.slice(0, 300) : "", title: typeof attrs.title === "string" ? attrs.title.slice(0, 300) : null };
     }
     if (Array.isArray(node.marks)) {
-      result.marks = node.marks.slice(0, 10).flatMap((mark) => {
+      result.marks = node.marks.slice(0, 10).flatMap<NonNullable<PostNode["marks"]>[number]>((mark) => {
         if (!mark || typeof mark.type !== "string" || !markTypes.has(mark.type)) return [];
         if (mark.type === "link") {
           const href = safeLink(mark.attrs?.href);
           return href ? [{ type: "link", attrs: { href } }] : [];
         }
+        if (mark.type === "textStyle") return FONT_SIZES.includes(mark.attrs?.fontSize) ? [{ type: mark.type, attrs: { fontSize: mark.attrs.fontSize } }] : [];
+        if (mark.type === "highlight") return HIGHLIGHT_COLORS.includes(mark.attrs?.color) ? [{ type: mark.type, attrs: { color: mark.attrs.color } }] : [];
         return [{ type: mark.type }];
       });
     }

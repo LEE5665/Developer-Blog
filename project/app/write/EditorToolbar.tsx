@@ -1,5 +1,6 @@
 "use client";
 
+import { FONT_SIZES, HIGHLIGHT_COLORS } from "@/lib/post-content";
 import type { Editor } from "@tiptap/react";
 import { Icon } from "@/app/components/Icon";
 
@@ -20,6 +21,10 @@ export function EditorToolbar({ editor, onLink, onImage }: Props) {
           if (event.target.value === "paragraph") editor?.chain().focus().setParagraph().run();
           else editor?.chain().focus().toggleHeading({ level: Number(event.target.value) as 2 | 3 | 4 }).run();
         }}><option value="paragraph">본문</option><option value="2">제목 1</option><option value="3">제목 2</option><option value="4">제목 3</option></select>
+      </div>
+      <div className="toolbar-group">
+        <select aria-label="글자 크기" disabled={!editor} value={editor?.getAttributes("textStyle").fontSize || ""} onChange={(event) => { if (event.target.value) editor?.chain().focus().setFontSize(event.target.value).run(); else editor?.chain().focus().unsetFontSize().run(); }}><option value="">기본 크기</option>{FONT_SIZES.map((size) => <option key={size} value={size}>{size.replace("px", "")} px</option>)}</select>
+        <select aria-label="글자 배경색" disabled={!editor} value={editor?.getAttributes("highlight").color || ""} onChange={(event) => { if (event.target.value) editor?.chain().focus().setHighlight({ color: event.target.value }).run(); else editor?.chain().focus().unsetHighlight().run(); }}><option value="">배경색 없음</option>{HIGHLIGHT_COLORS.map((color, index) => <option key={color} value={color}>{["노랑", "초록", "파랑", "분홍", "보라"][index]}</option>)}</select>
       </div>
       <div className="toolbar-group">
         {tool("굵게 (Ctrl+B)", <b>B</b>, () => editor?.chain().focus().toggleBold().run(), editor?.isActive("bold"))}
