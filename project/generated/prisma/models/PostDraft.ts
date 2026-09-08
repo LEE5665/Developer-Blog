@@ -68,6 +68,7 @@ export type PostDraftCountAggregateOutputType = {
   key: number
   postId: number
   title: number
+  tags: number
   content: number
   categoryId: number
   visibility: number
@@ -120,6 +121,7 @@ export type PostDraftCountAggregateInputType = {
   key?: true
   postId?: true
   title?: true
+  tags?: true
   content?: true
   categoryId?: true
   visibility?: true
@@ -221,6 +223,7 @@ export type PostDraftGroupByOutputType = {
   key: string
   postId: string | null
   title: string
+  tags: string[]
   content: string
   categoryId: string | null
   visibility: $Enums.Visibility
@@ -258,6 +261,7 @@ export type PostDraftWhereInput = {
   key?: Prisma.StringFilter<"PostDraft"> | string
   postId?: Prisma.StringNullableFilter<"PostDraft"> | string | null
   title?: Prisma.StringFilter<"PostDraft"> | string
+  tags?: Prisma.StringNullableListFilter<"PostDraft">
   content?: Prisma.StringFilter<"PostDraft"> | string
   categoryId?: Prisma.StringNullableFilter<"PostDraft"> | string | null
   visibility?: Prisma.EnumVisibilityFilter<"PostDraft"> | $Enums.Visibility
@@ -275,6 +279,7 @@ export type PostDraftOrderByWithRelationInput = {
   key?: Prisma.SortOrder
   postId?: Prisma.SortOrderInput | Prisma.SortOrder
   title?: Prisma.SortOrder
+  tags?: Prisma.SortOrder
   content?: Prisma.SortOrder
   categoryId?: Prisma.SortOrderInput | Prisma.SortOrder
   visibility?: Prisma.SortOrder
@@ -296,6 +301,7 @@ export type PostDraftWhereUniqueInput = Prisma.AtLeast<{
   key?: Prisma.StringFilter<"PostDraft"> | string
   postId?: Prisma.StringNullableFilter<"PostDraft"> | string | null
   title?: Prisma.StringFilter<"PostDraft"> | string
+  tags?: Prisma.StringNullableListFilter<"PostDraft">
   content?: Prisma.StringFilter<"PostDraft"> | string
   categoryId?: Prisma.StringNullableFilter<"PostDraft"> | string | null
   visibility?: Prisma.EnumVisibilityFilter<"PostDraft"> | $Enums.Visibility
@@ -313,6 +319,7 @@ export type PostDraftOrderByWithAggregationInput = {
   key?: Prisma.SortOrder
   postId?: Prisma.SortOrderInput | Prisma.SortOrder
   title?: Prisma.SortOrder
+  tags?: Prisma.SortOrder
   content?: Prisma.SortOrder
   categoryId?: Prisma.SortOrderInput | Prisma.SortOrder
   visibility?: Prisma.SortOrder
@@ -335,6 +342,7 @@ export type PostDraftScalarWhereWithAggregatesInput = {
   key?: Prisma.StringWithAggregatesFilter<"PostDraft"> | string
   postId?: Prisma.StringNullableWithAggregatesFilter<"PostDraft"> | string | null
   title?: Prisma.StringWithAggregatesFilter<"PostDraft"> | string
+  tags?: Prisma.StringNullableListFilter<"PostDraft">
   content?: Prisma.StringWithAggregatesFilter<"PostDraft"> | string
   categoryId?: Prisma.StringNullableWithAggregatesFilter<"PostDraft"> | string | null
   visibility?: Prisma.EnumVisibilityWithAggregatesFilter<"PostDraft"> | $Enums.Visibility
@@ -347,6 +355,7 @@ export type PostDraftCreateInput = {
   id?: string
   key: string
   title?: string
+  tags?: Prisma.PostDraftCreatetagsInput | string[]
   content: string
   categoryId?: string | null
   visibility?: $Enums.Visibility
@@ -364,6 +373,7 @@ export type PostDraftUncheckedCreateInput = {
   key: string
   postId?: string | null
   title?: string
+  tags?: Prisma.PostDraftCreatetagsInput | string[]
   content: string
   categoryId?: string | null
   visibility?: $Enums.Visibility
@@ -377,6 +387,7 @@ export type PostDraftUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
+  tags?: Prisma.PostDraftUpdatetagsInput | string[]
   content?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
@@ -394,6 +405,7 @@ export type PostDraftUncheckedUpdateInput = {
   key?: Prisma.StringFieldUpdateOperationsInput | string
   postId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
+  tags?: Prisma.PostDraftUpdatetagsInput | string[]
   content?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
@@ -409,6 +421,7 @@ export type PostDraftCreateManyInput = {
   key: string
   postId?: string | null
   title?: string
+  tags?: Prisma.PostDraftCreatetagsInput | string[]
   content: string
   categoryId?: string | null
   visibility?: $Enums.Visibility
@@ -421,6 +434,7 @@ export type PostDraftUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
+  tags?: Prisma.PostDraftUpdatetagsInput | string[]
   content?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
@@ -435,6 +449,7 @@ export type PostDraftUncheckedUpdateManyInput = {
   key?: Prisma.StringFieldUpdateOperationsInput | string
   postId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
+  tags?: Prisma.PostDraftUpdatetagsInput | string[]
   content?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
@@ -464,6 +479,7 @@ export type PostDraftCountOrderByAggregateInput = {
   key?: Prisma.SortOrder
   postId?: Prisma.SortOrder
   title?: Prisma.SortOrder
+  tags?: Prisma.SortOrder
   content?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
   visibility?: Prisma.SortOrder
@@ -597,6 +613,15 @@ export type PostDraftUncheckedUpdateManyWithoutPostNestedInput = {
   deleteMany?: Prisma.PostDraftScalarWhereInput | Prisma.PostDraftScalarWhereInput[]
 }
 
+export type PostDraftCreatetagsInput = {
+  set: string[]
+}
+
+export type PostDraftUpdatetagsInput = {
+  set?: string[]
+  push?: string | string[]
+}
+
 export type PostDraftCreateNestedOneWithoutImagesInput = {
   create?: Prisma.XOR<Prisma.PostDraftCreateWithoutImagesInput, Prisma.PostDraftUncheckedCreateWithoutImagesInput>
   connectOrCreate?: Prisma.PostDraftCreateOrConnectWithoutImagesInput
@@ -615,6 +640,7 @@ export type PostDraftCreateWithoutUserInput = {
   id?: string
   key: string
   title?: string
+  tags?: Prisma.PostDraftCreatetagsInput | string[]
   content: string
   categoryId?: string | null
   visibility?: $Enums.Visibility
@@ -630,6 +656,7 @@ export type PostDraftUncheckedCreateWithoutUserInput = {
   key: string
   postId?: string | null
   title?: string
+  tags?: Prisma.PostDraftCreatetagsInput | string[]
   content: string
   categoryId?: string | null
   visibility?: $Enums.Visibility
@@ -674,6 +701,7 @@ export type PostDraftScalarWhereInput = {
   key?: Prisma.StringFilter<"PostDraft"> | string
   postId?: Prisma.StringNullableFilter<"PostDraft"> | string | null
   title?: Prisma.StringFilter<"PostDraft"> | string
+  tags?: Prisma.StringNullableListFilter<"PostDraft">
   content?: Prisma.StringFilter<"PostDraft"> | string
   categoryId?: Prisma.StringNullableFilter<"PostDraft"> | string | null
   visibility?: Prisma.EnumVisibilityFilter<"PostDraft"> | $Enums.Visibility
@@ -686,6 +714,7 @@ export type PostDraftCreateWithoutPostInput = {
   id?: string
   key: string
   title?: string
+  tags?: Prisma.PostDraftCreatetagsInput | string[]
   content: string
   categoryId?: string | null
   visibility?: $Enums.Visibility
@@ -701,6 +730,7 @@ export type PostDraftUncheckedCreateWithoutPostInput = {
   userId: string
   key: string
   title?: string
+  tags?: Prisma.PostDraftCreatetagsInput | string[]
   content: string
   categoryId?: string | null
   visibility?: $Enums.Visibility
@@ -740,6 +770,7 @@ export type PostDraftCreateWithoutImagesInput = {
   id?: string
   key: string
   title?: string
+  tags?: Prisma.PostDraftCreatetagsInput | string[]
   content: string
   categoryId?: string | null
   visibility?: $Enums.Visibility
@@ -756,6 +787,7 @@ export type PostDraftUncheckedCreateWithoutImagesInput = {
   key: string
   postId?: string | null
   title?: string
+  tags?: Prisma.PostDraftCreatetagsInput | string[]
   content: string
   categoryId?: string | null
   visibility?: $Enums.Visibility
@@ -784,6 +816,7 @@ export type PostDraftUpdateWithoutImagesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
+  tags?: Prisma.PostDraftUpdatetagsInput | string[]
   content?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
@@ -800,6 +833,7 @@ export type PostDraftUncheckedUpdateWithoutImagesInput = {
   key?: Prisma.StringFieldUpdateOperationsInput | string
   postId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
+  tags?: Prisma.PostDraftUpdatetagsInput | string[]
   content?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
@@ -813,6 +847,7 @@ export type PostDraftCreateManyUserInput = {
   key: string
   postId?: string | null
   title?: string
+  tags?: Prisma.PostDraftCreatetagsInput | string[]
   content: string
   categoryId?: string | null
   visibility?: $Enums.Visibility
@@ -825,6 +860,7 @@ export type PostDraftUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
+  tags?: Prisma.PostDraftUpdatetagsInput | string[]
   content?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
@@ -840,6 +876,7 @@ export type PostDraftUncheckedUpdateWithoutUserInput = {
   key?: Prisma.StringFieldUpdateOperationsInput | string
   postId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
+  tags?: Prisma.PostDraftUpdatetagsInput | string[]
   content?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
@@ -854,6 +891,7 @@ export type PostDraftUncheckedUpdateManyWithoutUserInput = {
   key?: Prisma.StringFieldUpdateOperationsInput | string
   postId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
+  tags?: Prisma.PostDraftUpdatetagsInput | string[]
   content?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
@@ -867,6 +905,7 @@ export type PostDraftCreateManyPostInput = {
   userId: string
   key: string
   title?: string
+  tags?: Prisma.PostDraftCreatetagsInput | string[]
   content: string
   categoryId?: string | null
   visibility?: $Enums.Visibility
@@ -879,6 +918,7 @@ export type PostDraftUpdateWithoutPostInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
+  tags?: Prisma.PostDraftUpdatetagsInput | string[]
   content?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
@@ -894,6 +934,7 @@ export type PostDraftUncheckedUpdateWithoutPostInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
+  tags?: Prisma.PostDraftUpdatetagsInput | string[]
   content?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
@@ -908,6 +949,7 @@ export type PostDraftUncheckedUpdateManyWithoutPostInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
+  tags?: Prisma.PostDraftUpdatetagsInput | string[]
   content?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
@@ -953,6 +995,7 @@ export type PostDraftSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   key?: boolean
   postId?: boolean
   title?: boolean
+  tags?: boolean
   content?: boolean
   categoryId?: boolean
   visibility?: boolean
@@ -971,6 +1014,7 @@ export type PostDraftSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   key?: boolean
   postId?: boolean
   title?: boolean
+  tags?: boolean
   content?: boolean
   categoryId?: boolean
   visibility?: boolean
@@ -987,6 +1031,7 @@ export type PostDraftSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   key?: boolean
   postId?: boolean
   title?: boolean
+  tags?: boolean
   content?: boolean
   categoryId?: boolean
   visibility?: boolean
@@ -1003,6 +1048,7 @@ export type PostDraftSelectScalar = {
   key?: boolean
   postId?: boolean
   title?: boolean
+  tags?: boolean
   content?: boolean
   categoryId?: boolean
   visibility?: boolean
@@ -1011,7 +1057,7 @@ export type PostDraftSelectScalar = {
   updatedAt?: boolean
 }
 
-export type PostDraftOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "key" | "postId" | "title" | "content" | "categoryId" | "visibility" | "version" | "createdAt" | "updatedAt", ExtArgs["result"]["postDraft"]>
+export type PostDraftOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "key" | "postId" | "title" | "tags" | "content" | "categoryId" | "visibility" | "version" | "createdAt" | "updatedAt", ExtArgs["result"]["postDraft"]>
 export type PostDraftInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   post?: boolean | Prisma.PostDraft$postArgs<ExtArgs>
@@ -1040,6 +1086,7 @@ export type $PostDraftPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     key: string
     postId: string | null
     title: string
+    tags: string[]
     content: string
     categoryId: string | null
     visibility: $Enums.Visibility
@@ -1477,6 +1524,7 @@ export interface PostDraftFieldRefs {
   readonly key: Prisma.FieldRef<"PostDraft", 'String'>
   readonly postId: Prisma.FieldRef<"PostDraft", 'String'>
   readonly title: Prisma.FieldRef<"PostDraft", 'String'>
+  readonly tags: Prisma.FieldRef<"PostDraft", 'String[]'>
   readonly content: Prisma.FieldRef<"PostDraft", 'String'>
   readonly categoryId: Prisma.FieldRef<"PostDraft", 'String'>
   readonly visibility: Prisma.FieldRef<"PostDraft", 'Visibility'>

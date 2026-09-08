@@ -226,6 +226,8 @@ export type UserWhereInput = {
   posts?: Prisma.PostListRelationFilter
   drafts?: Prisma.PostDraftListRelationFilter
   images?: Prisma.ImageAssetListRelationFilter
+  likes?: Prisma.PostLikeListRelationFilter
+  comments?: Prisma.CommentListRelationFilter
   categories?: Prisma.CategoryListRelationFilter
   todos?: Prisma.TodoListRelationFilter
   sentFriendRequests?: Prisma.FriendshipListRelationFilter
@@ -247,6 +249,8 @@ export type UserOrderByWithRelationInput = {
   posts?: Prisma.PostOrderByRelationAggregateInput
   drafts?: Prisma.PostDraftOrderByRelationAggregateInput
   images?: Prisma.ImageAssetOrderByRelationAggregateInput
+  likes?: Prisma.PostLikeOrderByRelationAggregateInput
+  comments?: Prisma.CommentOrderByRelationAggregateInput
   categories?: Prisma.CategoryOrderByRelationAggregateInput
   todos?: Prisma.TodoOrderByRelationAggregateInput
   sentFriendRequests?: Prisma.FriendshipOrderByRelationAggregateInput
@@ -272,6 +276,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   posts?: Prisma.PostListRelationFilter
   drafts?: Prisma.PostDraftListRelationFilter
   images?: Prisma.ImageAssetListRelationFilter
+  likes?: Prisma.PostLikeListRelationFilter
+  comments?: Prisma.CommentListRelationFilter
   categories?: Prisma.CategoryListRelationFilter
   todos?: Prisma.TodoListRelationFilter
   sentFriendRequests?: Prisma.FriendshipListRelationFilter
@@ -325,6 +331,8 @@ export type UserCreateInput = {
   posts?: Prisma.PostCreateNestedManyWithoutAuthorInput
   drafts?: Prisma.PostDraftCreateNestedManyWithoutUserInput
   images?: Prisma.ImageAssetCreateNestedManyWithoutOwnerInput
+  likes?: Prisma.PostLikeCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
   categories?: Prisma.CategoryCreateNestedManyWithoutUserInput
   todos?: Prisma.TodoCreateNestedManyWithoutUserInput
   sentFriendRequests?: Prisma.FriendshipCreateNestedManyWithoutUserInput
@@ -346,6 +354,8 @@ export type UserUncheckedCreateInput = {
   posts?: Prisma.PostUncheckedCreateNestedManyWithoutAuthorInput
   drafts?: Prisma.PostDraftUncheckedCreateNestedManyWithoutUserInput
   images?: Prisma.ImageAssetUncheckedCreateNestedManyWithoutOwnerInput
+  likes?: Prisma.PostLikeUncheckedCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
   categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUserInput
   todos?: Prisma.TodoUncheckedCreateNestedManyWithoutUserInput
   sentFriendRequests?: Prisma.FriendshipUncheckedCreateNestedManyWithoutUserInput
@@ -367,6 +377,8 @@ export type UserUpdateInput = {
   posts?: Prisma.PostUpdateManyWithoutAuthorNestedInput
   drafts?: Prisma.PostDraftUpdateManyWithoutUserNestedInput
   images?: Prisma.ImageAssetUpdateManyWithoutOwnerNestedInput
+  likes?: Prisma.PostLikeUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
   categories?: Prisma.CategoryUpdateManyWithoutUserNestedInput
   todos?: Prisma.TodoUpdateManyWithoutUserNestedInput
   sentFriendRequests?: Prisma.FriendshipUpdateManyWithoutUserNestedInput
@@ -388,6 +400,8 @@ export type UserUncheckedUpdateInput = {
   posts?: Prisma.PostUncheckedUpdateManyWithoutAuthorNestedInput
   drafts?: Prisma.PostDraftUncheckedUpdateManyWithoutUserNestedInput
   images?: Prisma.ImageAssetUncheckedUpdateManyWithoutOwnerNestedInput
+  likes?: Prisma.PostLikeUncheckedUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
   categories?: Prisma.CategoryUncheckedUpdateManyWithoutUserNestedInput
   todos?: Prisma.TodoUncheckedUpdateManyWithoutUserNestedInput
   sentFriendRequests?: Prisma.FriendshipUncheckedUpdateManyWithoutUserNestedInput
@@ -482,6 +496,11 @@ export type UserScalarRelationFilter = {
   isNot?: Prisma.UserWhereInput
 }
 
+export type UserNullableScalarRelationFilter = {
+  is?: Prisma.UserWhereInput | null
+  isNot?: Prisma.UserWhereInput | null
+}
+
 export type StringFieldUpdateOperationsInput = {
   set?: string
 }
@@ -554,6 +573,36 @@ export type UserUpdateOneRequiredWithoutDraftsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutDraftsInput, Prisma.UserUpdateWithoutDraftsInput>, Prisma.UserUncheckedUpdateWithoutDraftsInput>
 }
 
+export type UserCreateNestedOneWithoutLikesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutLikesInput, Prisma.UserUncheckedCreateWithoutLikesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutLikesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutLikesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutLikesInput, Prisma.UserUncheckedCreateWithoutLikesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutLikesInput
+  upsert?: Prisma.UserUpsertWithoutLikesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutLikesInput, Prisma.UserUpdateWithoutLikesInput>, Prisma.UserUncheckedUpdateWithoutLikesInput>
+}
+
+export type UserCreateNestedOneWithoutCommentsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCommentsInput, Prisma.UserUncheckedCreateWithoutCommentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCommentsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutCommentsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCommentsInput, Prisma.UserUncheckedCreateWithoutCommentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCommentsInput
+  upsert?: Prisma.UserUpsertWithoutCommentsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCommentsInput, Prisma.UserUpdateWithoutCommentsInput>, Prisma.UserUncheckedUpdateWithoutCommentsInput>
+}
+
 export type UserCreateNestedOneWithoutImagesInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutImagesInput, Prisma.UserUncheckedCreateWithoutImagesInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutImagesInput
@@ -624,6 +673,8 @@ export type UserCreateWithoutAccountsInput = {
   posts?: Prisma.PostCreateNestedManyWithoutAuthorInput
   drafts?: Prisma.PostDraftCreateNestedManyWithoutUserInput
   images?: Prisma.ImageAssetCreateNestedManyWithoutOwnerInput
+  likes?: Prisma.PostLikeCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
   categories?: Prisma.CategoryCreateNestedManyWithoutUserInput
   todos?: Prisma.TodoCreateNestedManyWithoutUserInput
   sentFriendRequests?: Prisma.FriendshipCreateNestedManyWithoutUserInput
@@ -644,6 +695,8 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   posts?: Prisma.PostUncheckedCreateNestedManyWithoutAuthorInput
   drafts?: Prisma.PostDraftUncheckedCreateNestedManyWithoutUserInput
   images?: Prisma.ImageAssetUncheckedCreateNestedManyWithoutOwnerInput
+  likes?: Prisma.PostLikeUncheckedCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
   categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUserInput
   todos?: Prisma.TodoUncheckedCreateNestedManyWithoutUserInput
   sentFriendRequests?: Prisma.FriendshipUncheckedCreateNestedManyWithoutUserInput
@@ -680,6 +733,8 @@ export type UserUpdateWithoutAccountsInput = {
   posts?: Prisma.PostUpdateManyWithoutAuthorNestedInput
   drafts?: Prisma.PostDraftUpdateManyWithoutUserNestedInput
   images?: Prisma.ImageAssetUpdateManyWithoutOwnerNestedInput
+  likes?: Prisma.PostLikeUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
   categories?: Prisma.CategoryUpdateManyWithoutUserNestedInput
   todos?: Prisma.TodoUpdateManyWithoutUserNestedInput
   sentFriendRequests?: Prisma.FriendshipUpdateManyWithoutUserNestedInput
@@ -700,6 +755,8 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   posts?: Prisma.PostUncheckedUpdateManyWithoutAuthorNestedInput
   drafts?: Prisma.PostDraftUncheckedUpdateManyWithoutUserNestedInput
   images?: Prisma.ImageAssetUncheckedUpdateManyWithoutOwnerNestedInput
+  likes?: Prisma.PostLikeUncheckedUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
   categories?: Prisma.CategoryUncheckedUpdateManyWithoutUserNestedInput
   todos?: Prisma.TodoUncheckedUpdateManyWithoutUserNestedInput
   sentFriendRequests?: Prisma.FriendshipUncheckedUpdateManyWithoutUserNestedInput
@@ -721,6 +778,8 @@ export type UserCreateWithoutCategoriesInput = {
   posts?: Prisma.PostCreateNestedManyWithoutAuthorInput
   drafts?: Prisma.PostDraftCreateNestedManyWithoutUserInput
   images?: Prisma.ImageAssetCreateNestedManyWithoutOwnerInput
+  likes?: Prisma.PostLikeCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
   todos?: Prisma.TodoCreateNestedManyWithoutUserInput
   sentFriendRequests?: Prisma.FriendshipCreateNestedManyWithoutUserInput
   receivedFriendRequests?: Prisma.FriendshipCreateNestedManyWithoutFriendInput
@@ -741,6 +800,8 @@ export type UserUncheckedCreateWithoutCategoriesInput = {
   posts?: Prisma.PostUncheckedCreateNestedManyWithoutAuthorInput
   drafts?: Prisma.PostDraftUncheckedCreateNestedManyWithoutUserInput
   images?: Prisma.ImageAssetUncheckedCreateNestedManyWithoutOwnerInput
+  likes?: Prisma.PostLikeUncheckedCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
   todos?: Prisma.TodoUncheckedCreateNestedManyWithoutUserInput
   sentFriendRequests?: Prisma.FriendshipUncheckedCreateNestedManyWithoutUserInput
   receivedFriendRequests?: Prisma.FriendshipUncheckedCreateNestedManyWithoutFriendInput
@@ -777,6 +838,8 @@ export type UserUpdateWithoutCategoriesInput = {
   posts?: Prisma.PostUpdateManyWithoutAuthorNestedInput
   drafts?: Prisma.PostDraftUpdateManyWithoutUserNestedInput
   images?: Prisma.ImageAssetUpdateManyWithoutOwnerNestedInput
+  likes?: Prisma.PostLikeUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
   todos?: Prisma.TodoUpdateManyWithoutUserNestedInput
   sentFriendRequests?: Prisma.FriendshipUpdateManyWithoutUserNestedInput
   receivedFriendRequests?: Prisma.FriendshipUpdateManyWithoutFriendNestedInput
@@ -797,6 +860,8 @@ export type UserUncheckedUpdateWithoutCategoriesInput = {
   posts?: Prisma.PostUncheckedUpdateManyWithoutAuthorNestedInput
   drafts?: Prisma.PostDraftUncheckedUpdateManyWithoutUserNestedInput
   images?: Prisma.ImageAssetUncheckedUpdateManyWithoutOwnerNestedInput
+  likes?: Prisma.PostLikeUncheckedUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
   todos?: Prisma.TodoUncheckedUpdateManyWithoutUserNestedInput
   sentFriendRequests?: Prisma.FriendshipUncheckedUpdateManyWithoutUserNestedInput
   receivedFriendRequests?: Prisma.FriendshipUncheckedUpdateManyWithoutFriendNestedInput
@@ -816,6 +881,8 @@ export type UserCreateWithoutPostsInput = {
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   drafts?: Prisma.PostDraftCreateNestedManyWithoutUserInput
   images?: Prisma.ImageAssetCreateNestedManyWithoutOwnerInput
+  likes?: Prisma.PostLikeCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
   categories?: Prisma.CategoryCreateNestedManyWithoutUserInput
   todos?: Prisma.TodoCreateNestedManyWithoutUserInput
   sentFriendRequests?: Prisma.FriendshipCreateNestedManyWithoutUserInput
@@ -836,6 +903,8 @@ export type UserUncheckedCreateWithoutPostsInput = {
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   drafts?: Prisma.PostDraftUncheckedCreateNestedManyWithoutUserInput
   images?: Prisma.ImageAssetUncheckedCreateNestedManyWithoutOwnerInput
+  likes?: Prisma.PostLikeUncheckedCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
   categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUserInput
   todos?: Prisma.TodoUncheckedCreateNestedManyWithoutUserInput
   sentFriendRequests?: Prisma.FriendshipUncheckedCreateNestedManyWithoutUserInput
@@ -872,6 +941,8 @@ export type UserUpdateWithoutPostsInput = {
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   drafts?: Prisma.PostDraftUpdateManyWithoutUserNestedInput
   images?: Prisma.ImageAssetUpdateManyWithoutOwnerNestedInput
+  likes?: Prisma.PostLikeUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
   categories?: Prisma.CategoryUpdateManyWithoutUserNestedInput
   todos?: Prisma.TodoUpdateManyWithoutUserNestedInput
   sentFriendRequests?: Prisma.FriendshipUpdateManyWithoutUserNestedInput
@@ -892,6 +963,8 @@ export type UserUncheckedUpdateWithoutPostsInput = {
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   drafts?: Prisma.PostDraftUncheckedUpdateManyWithoutUserNestedInput
   images?: Prisma.ImageAssetUncheckedUpdateManyWithoutOwnerNestedInput
+  likes?: Prisma.PostLikeUncheckedUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
   categories?: Prisma.CategoryUncheckedUpdateManyWithoutUserNestedInput
   todos?: Prisma.TodoUncheckedUpdateManyWithoutUserNestedInput
   sentFriendRequests?: Prisma.FriendshipUncheckedUpdateManyWithoutUserNestedInput
@@ -912,6 +985,8 @@ export type UserCreateWithoutDraftsInput = {
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   posts?: Prisma.PostCreateNestedManyWithoutAuthorInput
   images?: Prisma.ImageAssetCreateNestedManyWithoutOwnerInput
+  likes?: Prisma.PostLikeCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
   categories?: Prisma.CategoryCreateNestedManyWithoutUserInput
   todos?: Prisma.TodoCreateNestedManyWithoutUserInput
   sentFriendRequests?: Prisma.FriendshipCreateNestedManyWithoutUserInput
@@ -932,6 +1007,8 @@ export type UserUncheckedCreateWithoutDraftsInput = {
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   posts?: Prisma.PostUncheckedCreateNestedManyWithoutAuthorInput
   images?: Prisma.ImageAssetUncheckedCreateNestedManyWithoutOwnerInput
+  likes?: Prisma.PostLikeUncheckedCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
   categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUserInput
   todos?: Prisma.TodoUncheckedCreateNestedManyWithoutUserInput
   sentFriendRequests?: Prisma.FriendshipUncheckedCreateNestedManyWithoutUserInput
@@ -968,6 +1045,8 @@ export type UserUpdateWithoutDraftsInput = {
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   posts?: Prisma.PostUpdateManyWithoutAuthorNestedInput
   images?: Prisma.ImageAssetUpdateManyWithoutOwnerNestedInput
+  likes?: Prisma.PostLikeUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
   categories?: Prisma.CategoryUpdateManyWithoutUserNestedInput
   todos?: Prisma.TodoUpdateManyWithoutUserNestedInput
   sentFriendRequests?: Prisma.FriendshipUpdateManyWithoutUserNestedInput
@@ -988,6 +1067,216 @@ export type UserUncheckedUpdateWithoutDraftsInput = {
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   posts?: Prisma.PostUncheckedUpdateManyWithoutAuthorNestedInput
   images?: Prisma.ImageAssetUncheckedUpdateManyWithoutOwnerNestedInput
+  likes?: Prisma.PostLikeUncheckedUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
+  categories?: Prisma.CategoryUncheckedUpdateManyWithoutUserNestedInput
+  todos?: Prisma.TodoUncheckedUpdateManyWithoutUserNestedInput
+  sentFriendRequests?: Prisma.FriendshipUncheckedUpdateManyWithoutUserNestedInput
+  receivedFriendRequests?: Prisma.FriendshipUncheckedUpdateManyWithoutFriendNestedInput
+}
+
+export type UserCreateWithoutLikesInput = {
+  id?: string
+  name?: string | null
+  nickname?: string | null
+  tag?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  image?: string | null
+  passwordHash?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  posts?: Prisma.PostCreateNestedManyWithoutAuthorInput
+  drafts?: Prisma.PostDraftCreateNestedManyWithoutUserInput
+  images?: Prisma.ImageAssetCreateNestedManyWithoutOwnerInput
+  comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
+  categories?: Prisma.CategoryCreateNestedManyWithoutUserInput
+  todos?: Prisma.TodoCreateNestedManyWithoutUserInput
+  sentFriendRequests?: Prisma.FriendshipCreateNestedManyWithoutUserInput
+  receivedFriendRequests?: Prisma.FriendshipCreateNestedManyWithoutFriendInput
+}
+
+export type UserUncheckedCreateWithoutLikesInput = {
+  id?: string
+  name?: string | null
+  nickname?: string | null
+  tag?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  image?: string | null
+  passwordHash?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  posts?: Prisma.PostUncheckedCreateNestedManyWithoutAuthorInput
+  drafts?: Prisma.PostDraftUncheckedCreateNestedManyWithoutUserInput
+  images?: Prisma.ImageAssetUncheckedCreateNestedManyWithoutOwnerInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
+  categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUserInput
+  todos?: Prisma.TodoUncheckedCreateNestedManyWithoutUserInput
+  sentFriendRequests?: Prisma.FriendshipUncheckedCreateNestedManyWithoutUserInput
+  receivedFriendRequests?: Prisma.FriendshipUncheckedCreateNestedManyWithoutFriendInput
+}
+
+export type UserCreateOrConnectWithoutLikesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutLikesInput, Prisma.UserUncheckedCreateWithoutLikesInput>
+}
+
+export type UserUpsertWithoutLikesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutLikesInput, Prisma.UserUncheckedUpdateWithoutLikesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutLikesInput, Prisma.UserUncheckedCreateWithoutLikesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutLikesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutLikesInput, Prisma.UserUncheckedUpdateWithoutLikesInput>
+}
+
+export type UserUpdateWithoutLikesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  posts?: Prisma.PostUpdateManyWithoutAuthorNestedInput
+  drafts?: Prisma.PostDraftUpdateManyWithoutUserNestedInput
+  images?: Prisma.ImageAssetUpdateManyWithoutOwnerNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
+  categories?: Prisma.CategoryUpdateManyWithoutUserNestedInput
+  todos?: Prisma.TodoUpdateManyWithoutUserNestedInput
+  sentFriendRequests?: Prisma.FriendshipUpdateManyWithoutUserNestedInput
+  receivedFriendRequests?: Prisma.FriendshipUpdateManyWithoutFriendNestedInput
+}
+
+export type UserUncheckedUpdateWithoutLikesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  posts?: Prisma.PostUncheckedUpdateManyWithoutAuthorNestedInput
+  drafts?: Prisma.PostDraftUncheckedUpdateManyWithoutUserNestedInput
+  images?: Prisma.ImageAssetUncheckedUpdateManyWithoutOwnerNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
+  categories?: Prisma.CategoryUncheckedUpdateManyWithoutUserNestedInput
+  todos?: Prisma.TodoUncheckedUpdateManyWithoutUserNestedInput
+  sentFriendRequests?: Prisma.FriendshipUncheckedUpdateManyWithoutUserNestedInput
+  receivedFriendRequests?: Prisma.FriendshipUncheckedUpdateManyWithoutFriendNestedInput
+}
+
+export type UserCreateWithoutCommentsInput = {
+  id?: string
+  name?: string | null
+  nickname?: string | null
+  tag?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  image?: string | null
+  passwordHash?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  posts?: Prisma.PostCreateNestedManyWithoutAuthorInput
+  drafts?: Prisma.PostDraftCreateNestedManyWithoutUserInput
+  images?: Prisma.ImageAssetCreateNestedManyWithoutOwnerInput
+  likes?: Prisma.PostLikeCreateNestedManyWithoutUserInput
+  categories?: Prisma.CategoryCreateNestedManyWithoutUserInput
+  todos?: Prisma.TodoCreateNestedManyWithoutUserInput
+  sentFriendRequests?: Prisma.FriendshipCreateNestedManyWithoutUserInput
+  receivedFriendRequests?: Prisma.FriendshipCreateNestedManyWithoutFriendInput
+}
+
+export type UserUncheckedCreateWithoutCommentsInput = {
+  id?: string
+  name?: string | null
+  nickname?: string | null
+  tag?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  image?: string | null
+  passwordHash?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  posts?: Prisma.PostUncheckedCreateNestedManyWithoutAuthorInput
+  drafts?: Prisma.PostDraftUncheckedCreateNestedManyWithoutUserInput
+  images?: Prisma.ImageAssetUncheckedCreateNestedManyWithoutOwnerInput
+  likes?: Prisma.PostLikeUncheckedCreateNestedManyWithoutUserInput
+  categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUserInput
+  todos?: Prisma.TodoUncheckedCreateNestedManyWithoutUserInput
+  sentFriendRequests?: Prisma.FriendshipUncheckedCreateNestedManyWithoutUserInput
+  receivedFriendRequests?: Prisma.FriendshipUncheckedCreateNestedManyWithoutFriendInput
+}
+
+export type UserCreateOrConnectWithoutCommentsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutCommentsInput, Prisma.UserUncheckedCreateWithoutCommentsInput>
+}
+
+export type UserUpsertWithoutCommentsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutCommentsInput, Prisma.UserUncheckedUpdateWithoutCommentsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutCommentsInput, Prisma.UserUncheckedCreateWithoutCommentsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutCommentsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutCommentsInput, Prisma.UserUncheckedUpdateWithoutCommentsInput>
+}
+
+export type UserUpdateWithoutCommentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  posts?: Prisma.PostUpdateManyWithoutAuthorNestedInput
+  drafts?: Prisma.PostDraftUpdateManyWithoutUserNestedInput
+  images?: Prisma.ImageAssetUpdateManyWithoutOwnerNestedInput
+  likes?: Prisma.PostLikeUpdateManyWithoutUserNestedInput
+  categories?: Prisma.CategoryUpdateManyWithoutUserNestedInput
+  todos?: Prisma.TodoUpdateManyWithoutUserNestedInput
+  sentFriendRequests?: Prisma.FriendshipUpdateManyWithoutUserNestedInput
+  receivedFriendRequests?: Prisma.FriendshipUpdateManyWithoutFriendNestedInput
+}
+
+export type UserUncheckedUpdateWithoutCommentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nickname?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tag?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  posts?: Prisma.PostUncheckedUpdateManyWithoutAuthorNestedInput
+  drafts?: Prisma.PostDraftUncheckedUpdateManyWithoutUserNestedInput
+  images?: Prisma.ImageAssetUncheckedUpdateManyWithoutOwnerNestedInput
+  likes?: Prisma.PostLikeUncheckedUpdateManyWithoutUserNestedInput
   categories?: Prisma.CategoryUncheckedUpdateManyWithoutUserNestedInput
   todos?: Prisma.TodoUncheckedUpdateManyWithoutUserNestedInput
   sentFriendRequests?: Prisma.FriendshipUncheckedUpdateManyWithoutUserNestedInput
@@ -1008,6 +1297,8 @@ export type UserCreateWithoutImagesInput = {
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   posts?: Prisma.PostCreateNestedManyWithoutAuthorInput
   drafts?: Prisma.PostDraftCreateNestedManyWithoutUserInput
+  likes?: Prisma.PostLikeCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
   categories?: Prisma.CategoryCreateNestedManyWithoutUserInput
   todos?: Prisma.TodoCreateNestedManyWithoutUserInput
   sentFriendRequests?: Prisma.FriendshipCreateNestedManyWithoutUserInput
@@ -1028,6 +1319,8 @@ export type UserUncheckedCreateWithoutImagesInput = {
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   posts?: Prisma.PostUncheckedCreateNestedManyWithoutAuthorInput
   drafts?: Prisma.PostDraftUncheckedCreateNestedManyWithoutUserInput
+  likes?: Prisma.PostLikeUncheckedCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
   categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUserInput
   todos?: Prisma.TodoUncheckedCreateNestedManyWithoutUserInput
   sentFriendRequests?: Prisma.FriendshipUncheckedCreateNestedManyWithoutUserInput
@@ -1064,6 +1357,8 @@ export type UserUpdateWithoutImagesInput = {
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   posts?: Prisma.PostUpdateManyWithoutAuthorNestedInput
   drafts?: Prisma.PostDraftUpdateManyWithoutUserNestedInput
+  likes?: Prisma.PostLikeUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
   categories?: Prisma.CategoryUpdateManyWithoutUserNestedInput
   todos?: Prisma.TodoUpdateManyWithoutUserNestedInput
   sentFriendRequests?: Prisma.FriendshipUpdateManyWithoutUserNestedInput
@@ -1084,6 +1379,8 @@ export type UserUncheckedUpdateWithoutImagesInput = {
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   posts?: Prisma.PostUncheckedUpdateManyWithoutAuthorNestedInput
   drafts?: Prisma.PostDraftUncheckedUpdateManyWithoutUserNestedInput
+  likes?: Prisma.PostLikeUncheckedUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
   categories?: Prisma.CategoryUncheckedUpdateManyWithoutUserNestedInput
   todos?: Prisma.TodoUncheckedUpdateManyWithoutUserNestedInput
   sentFriendRequests?: Prisma.FriendshipUncheckedUpdateManyWithoutUserNestedInput
@@ -1105,6 +1402,8 @@ export type UserCreateWithoutSentFriendRequestsInput = {
   posts?: Prisma.PostCreateNestedManyWithoutAuthorInput
   drafts?: Prisma.PostDraftCreateNestedManyWithoutUserInput
   images?: Prisma.ImageAssetCreateNestedManyWithoutOwnerInput
+  likes?: Prisma.PostLikeCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
   categories?: Prisma.CategoryCreateNestedManyWithoutUserInput
   todos?: Prisma.TodoCreateNestedManyWithoutUserInput
   receivedFriendRequests?: Prisma.FriendshipCreateNestedManyWithoutFriendInput
@@ -1125,6 +1424,8 @@ export type UserUncheckedCreateWithoutSentFriendRequestsInput = {
   posts?: Prisma.PostUncheckedCreateNestedManyWithoutAuthorInput
   drafts?: Prisma.PostDraftUncheckedCreateNestedManyWithoutUserInput
   images?: Prisma.ImageAssetUncheckedCreateNestedManyWithoutOwnerInput
+  likes?: Prisma.PostLikeUncheckedCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
   categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUserInput
   todos?: Prisma.TodoUncheckedCreateNestedManyWithoutUserInput
   receivedFriendRequests?: Prisma.FriendshipUncheckedCreateNestedManyWithoutFriendInput
@@ -1150,6 +1451,8 @@ export type UserCreateWithoutReceivedFriendRequestsInput = {
   posts?: Prisma.PostCreateNestedManyWithoutAuthorInput
   drafts?: Prisma.PostDraftCreateNestedManyWithoutUserInput
   images?: Prisma.ImageAssetCreateNestedManyWithoutOwnerInput
+  likes?: Prisma.PostLikeCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
   categories?: Prisma.CategoryCreateNestedManyWithoutUserInput
   todos?: Prisma.TodoCreateNestedManyWithoutUserInput
   sentFriendRequests?: Prisma.FriendshipCreateNestedManyWithoutUserInput
@@ -1170,6 +1473,8 @@ export type UserUncheckedCreateWithoutReceivedFriendRequestsInput = {
   posts?: Prisma.PostUncheckedCreateNestedManyWithoutAuthorInput
   drafts?: Prisma.PostDraftUncheckedCreateNestedManyWithoutUserInput
   images?: Prisma.ImageAssetUncheckedCreateNestedManyWithoutOwnerInput
+  likes?: Prisma.PostLikeUncheckedCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
   categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUserInput
   todos?: Prisma.TodoUncheckedCreateNestedManyWithoutUserInput
   sentFriendRequests?: Prisma.FriendshipUncheckedCreateNestedManyWithoutUserInput
@@ -1206,6 +1511,8 @@ export type UserUpdateWithoutSentFriendRequestsInput = {
   posts?: Prisma.PostUpdateManyWithoutAuthorNestedInput
   drafts?: Prisma.PostDraftUpdateManyWithoutUserNestedInput
   images?: Prisma.ImageAssetUpdateManyWithoutOwnerNestedInput
+  likes?: Prisma.PostLikeUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
   categories?: Prisma.CategoryUpdateManyWithoutUserNestedInput
   todos?: Prisma.TodoUpdateManyWithoutUserNestedInput
   receivedFriendRequests?: Prisma.FriendshipUpdateManyWithoutFriendNestedInput
@@ -1226,6 +1533,8 @@ export type UserUncheckedUpdateWithoutSentFriendRequestsInput = {
   posts?: Prisma.PostUncheckedUpdateManyWithoutAuthorNestedInput
   drafts?: Prisma.PostDraftUncheckedUpdateManyWithoutUserNestedInput
   images?: Prisma.ImageAssetUncheckedUpdateManyWithoutOwnerNestedInput
+  likes?: Prisma.PostLikeUncheckedUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
   categories?: Prisma.CategoryUncheckedUpdateManyWithoutUserNestedInput
   todos?: Prisma.TodoUncheckedUpdateManyWithoutUserNestedInput
   receivedFriendRequests?: Prisma.FriendshipUncheckedUpdateManyWithoutFriendNestedInput
@@ -1257,6 +1566,8 @@ export type UserUpdateWithoutReceivedFriendRequestsInput = {
   posts?: Prisma.PostUpdateManyWithoutAuthorNestedInput
   drafts?: Prisma.PostDraftUpdateManyWithoutUserNestedInput
   images?: Prisma.ImageAssetUpdateManyWithoutOwnerNestedInput
+  likes?: Prisma.PostLikeUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
   categories?: Prisma.CategoryUpdateManyWithoutUserNestedInput
   todos?: Prisma.TodoUpdateManyWithoutUserNestedInput
   sentFriendRequests?: Prisma.FriendshipUpdateManyWithoutUserNestedInput
@@ -1277,6 +1588,8 @@ export type UserUncheckedUpdateWithoutReceivedFriendRequestsInput = {
   posts?: Prisma.PostUncheckedUpdateManyWithoutAuthorNestedInput
   drafts?: Prisma.PostDraftUncheckedUpdateManyWithoutUserNestedInput
   images?: Prisma.ImageAssetUncheckedUpdateManyWithoutOwnerNestedInput
+  likes?: Prisma.PostLikeUncheckedUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
   categories?: Prisma.CategoryUncheckedUpdateManyWithoutUserNestedInput
   todos?: Prisma.TodoUncheckedUpdateManyWithoutUserNestedInput
   sentFriendRequests?: Prisma.FriendshipUncheckedUpdateManyWithoutUserNestedInput
@@ -1297,6 +1610,8 @@ export type UserCreateWithoutTodosInput = {
   posts?: Prisma.PostCreateNestedManyWithoutAuthorInput
   drafts?: Prisma.PostDraftCreateNestedManyWithoutUserInput
   images?: Prisma.ImageAssetCreateNestedManyWithoutOwnerInput
+  likes?: Prisma.PostLikeCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentCreateNestedManyWithoutAuthorInput
   categories?: Prisma.CategoryCreateNestedManyWithoutUserInput
   sentFriendRequests?: Prisma.FriendshipCreateNestedManyWithoutUserInput
   receivedFriendRequests?: Prisma.FriendshipCreateNestedManyWithoutFriendInput
@@ -1317,6 +1632,8 @@ export type UserUncheckedCreateWithoutTodosInput = {
   posts?: Prisma.PostUncheckedCreateNestedManyWithoutAuthorInput
   drafts?: Prisma.PostDraftUncheckedCreateNestedManyWithoutUserInput
   images?: Prisma.ImageAssetUncheckedCreateNestedManyWithoutOwnerInput
+  likes?: Prisma.PostLikeUncheckedCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutAuthorInput
   categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUserInput
   sentFriendRequests?: Prisma.FriendshipUncheckedCreateNestedManyWithoutUserInput
   receivedFriendRequests?: Prisma.FriendshipUncheckedCreateNestedManyWithoutFriendInput
@@ -1353,6 +1670,8 @@ export type UserUpdateWithoutTodosInput = {
   posts?: Prisma.PostUpdateManyWithoutAuthorNestedInput
   drafts?: Prisma.PostDraftUpdateManyWithoutUserNestedInput
   images?: Prisma.ImageAssetUpdateManyWithoutOwnerNestedInput
+  likes?: Prisma.PostLikeUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutAuthorNestedInput
   categories?: Prisma.CategoryUpdateManyWithoutUserNestedInput
   sentFriendRequests?: Prisma.FriendshipUpdateManyWithoutUserNestedInput
   receivedFriendRequests?: Prisma.FriendshipUpdateManyWithoutFriendNestedInput
@@ -1373,6 +1692,8 @@ export type UserUncheckedUpdateWithoutTodosInput = {
   posts?: Prisma.PostUncheckedUpdateManyWithoutAuthorNestedInput
   drafts?: Prisma.PostDraftUncheckedUpdateManyWithoutUserNestedInput
   images?: Prisma.ImageAssetUncheckedUpdateManyWithoutOwnerNestedInput
+  likes?: Prisma.PostLikeUncheckedUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutAuthorNestedInput
   categories?: Prisma.CategoryUncheckedUpdateManyWithoutUserNestedInput
   sentFriendRequests?: Prisma.FriendshipUncheckedUpdateManyWithoutUserNestedInput
   receivedFriendRequests?: Prisma.FriendshipUncheckedUpdateManyWithoutFriendNestedInput
@@ -1388,6 +1709,8 @@ export type UserCountOutputType = {
   posts: number
   drafts: number
   images: number
+  likes: number
+  comments: number
   categories: number
   todos: number
   sentFriendRequests: number
@@ -1399,6 +1722,8 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   posts?: boolean | UserCountOutputTypeCountPostsArgs
   drafts?: boolean | UserCountOutputTypeCountDraftsArgs
   images?: boolean | UserCountOutputTypeCountImagesArgs
+  likes?: boolean | UserCountOutputTypeCountLikesArgs
+  comments?: boolean | UserCountOutputTypeCountCommentsArgs
   categories?: boolean | UserCountOutputTypeCountCategoriesArgs
   todos?: boolean | UserCountOutputTypeCountTodosArgs
   sentFriendRequests?: boolean | UserCountOutputTypeCountSentFriendRequestsArgs
@@ -1446,6 +1771,20 @@ export type UserCountOutputTypeCountImagesArgs<ExtArgs extends runtime.Types.Ext
 /**
  * UserCountOutputType without action
  */
+export type UserCountOutputTypeCountLikesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PostLikeWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountCommentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CommentWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
 export type UserCountOutputTypeCountCategoriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.CategoryWhereInput
 }
@@ -1487,6 +1826,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   posts?: boolean | Prisma.User$postsArgs<ExtArgs>
   drafts?: boolean | Prisma.User$draftsArgs<ExtArgs>
   images?: boolean | Prisma.User$imagesArgs<ExtArgs>
+  likes?: boolean | Prisma.User$likesArgs<ExtArgs>
+  comments?: boolean | Prisma.User$commentsArgs<ExtArgs>
   categories?: boolean | Prisma.User$categoriesArgs<ExtArgs>
   todos?: boolean | Prisma.User$todosArgs<ExtArgs>
   sentFriendRequests?: boolean | Prisma.User$sentFriendRequestsArgs<ExtArgs>
@@ -1539,6 +1880,8 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   posts?: boolean | Prisma.User$postsArgs<ExtArgs>
   drafts?: boolean | Prisma.User$draftsArgs<ExtArgs>
   images?: boolean | Prisma.User$imagesArgs<ExtArgs>
+  likes?: boolean | Prisma.User$likesArgs<ExtArgs>
+  comments?: boolean | Prisma.User$commentsArgs<ExtArgs>
   categories?: boolean | Prisma.User$categoriesArgs<ExtArgs>
   todos?: boolean | Prisma.User$todosArgs<ExtArgs>
   sentFriendRequests?: boolean | Prisma.User$sentFriendRequestsArgs<ExtArgs>
@@ -1555,6 +1898,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     posts: Prisma.$PostPayload<ExtArgs>[]
     drafts: Prisma.$PostDraftPayload<ExtArgs>[]
     images: Prisma.$ImageAssetPayload<ExtArgs>[]
+    likes: Prisma.$PostLikePayload<ExtArgs>[]
+    comments: Prisma.$CommentPayload<ExtArgs>[]
     categories: Prisma.$CategoryPayload<ExtArgs>[]
     todos: Prisma.$TodoPayload<ExtArgs>[]
     sentFriendRequests: Prisma.$FriendshipPayload<ExtArgs>[]
@@ -1969,6 +2314,8 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   posts<T extends Prisma.User$postsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$postsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PostPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   drafts<T extends Prisma.User$draftsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$draftsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PostDraftPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   images<T extends Prisma.User$imagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$imagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ImageAssetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  likes<T extends Prisma.User$likesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$likesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PostLikePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  comments<T extends Prisma.User$commentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$commentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   categories<T extends Prisma.User$categoriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$categoriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CategoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   todos<T extends Prisma.User$todosArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$todosArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TodoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   sentFriendRequests<T extends Prisma.User$sentFriendRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sentFriendRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FriendshipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2498,6 +2845,54 @@ export type User$imagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
   take?: number
   skip?: number
   distinct?: Prisma.ImageAssetScalarFieldEnum | Prisma.ImageAssetScalarFieldEnum[]
+}
+
+/**
+ * User.likes
+ */
+export type User$likesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PostLike
+   */
+  select?: Prisma.PostLikeSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PostLike
+   */
+  omit?: Prisma.PostLikeOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PostLikeInclude<ExtArgs> | null
+  where?: Prisma.PostLikeWhereInput
+  orderBy?: Prisma.PostLikeOrderByWithRelationInput | Prisma.PostLikeOrderByWithRelationInput[]
+  cursor?: Prisma.PostLikeWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PostLikeScalarFieldEnum | Prisma.PostLikeScalarFieldEnum[]
+}
+
+/**
+ * User.comments
+ */
+export type User$commentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Comment
+   */
+  select?: Prisma.CommentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Comment
+   */
+  omit?: Prisma.CommentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CommentInclude<ExtArgs> | null
+  where?: Prisma.CommentWhereInput
+  orderBy?: Prisma.CommentOrderByWithRelationInput | Prisma.CommentOrderByWithRelationInput[]
+  cursor?: Prisma.CommentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CommentScalarFieldEnum | Prisma.CommentScalarFieldEnum[]
 }
 
 /**

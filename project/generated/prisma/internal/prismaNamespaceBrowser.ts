@@ -57,6 +57,10 @@ export const ModelName = {
   Category: 'Category',
   Post: 'Post',
   PostDraft: 'PostDraft',
+  PostLike: 'PostLike',
+  Comment: 'Comment',
+  PostView: 'PostView',
+  ActionLimit: 'ActionLimit',
   ImageAsset: 'ImageAsset',
   PostImage: 'PostImage',
   DraftImage: 'DraftImage',
@@ -139,6 +143,7 @@ export type CategoryScalarFieldEnum = (typeof CategoryScalarFieldEnum)[keyof typ
 export const PostScalarFieldEnum = {
   id: 'id',
   title: 'title',
+  tags: 'tags',
   content: 'content',
   visibility: 'visibility',
   authorId: 'authorId',
@@ -156,6 +161,7 @@ export const PostDraftScalarFieldEnum = {
   key: 'key',
   postId: 'postId',
   title: 'title',
+  tags: 'tags',
   content: 'content',
   categoryId: 'categoryId',
   visibility: 'visibility',
@@ -165,6 +171,49 @@ export const PostDraftScalarFieldEnum = {
 } as const
 
 export type PostDraftScalarFieldEnum = (typeof PostDraftScalarFieldEnum)[keyof typeof PostDraftScalarFieldEnum]
+
+
+export const PostLikeScalarFieldEnum = {
+  postId: 'postId',
+  userId: 'userId',
+  createdAt: 'createdAt'
+} as const
+
+export type PostLikeScalarFieldEnum = (typeof PostLikeScalarFieldEnum)[keyof typeof PostLikeScalarFieldEnum]
+
+
+export const CommentScalarFieldEnum = {
+  id: 'id',
+  postId: 'postId',
+  authorId: 'authorId',
+  anonymous: 'anonymous',
+  nickname: 'nickname',
+  passwordHash: 'passwordHash',
+  content: 'content',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CommentScalarFieldEnum = (typeof CommentScalarFieldEnum)[keyof typeof CommentScalarFieldEnum]
+
+
+export const PostViewScalarFieldEnum = {
+  postId: 'postId',
+  viewerHash: 'viewerHash',
+  day: 'day',
+  createdAt: 'createdAt'
+} as const
+
+export type PostViewScalarFieldEnum = (typeof PostViewScalarFieldEnum)[keyof typeof PostViewScalarFieldEnum]
+
+
+export const ActionLimitScalarFieldEnum = {
+  key: 'key',
+  count: 'count',
+  resetAt: 'resetAt'
+} as const
+
+export type ActionLimitScalarFieldEnum = (typeof ActionLimitScalarFieldEnum)[keyof typeof ActionLimitScalarFieldEnum]
 
 
 export const ImageAssetScalarFieldEnum = {

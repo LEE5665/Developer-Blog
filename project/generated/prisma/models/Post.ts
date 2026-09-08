@@ -49,6 +49,7 @@ export type PostMaxAggregateOutputType = {
 export type PostCountAggregateOutputType = {
   id: number
   title: number
+  tags: number
   content: number
   visibility: number
   authorId: number
@@ -84,6 +85,7 @@ export type PostMaxAggregateInputType = {
 export type PostCountAggregateInputType = {
   id?: true
   title?: true
+  tags?: true
   content?: true
   visibility?: true
   authorId?: true
@@ -168,6 +170,7 @@ export type PostGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type PostGroupByOutputType = {
   id: string
   title: string
+  tags: string[]
   content: string
   visibility: $Enums.Visibility
   authorId: string
@@ -200,6 +203,7 @@ export type PostWhereInput = {
   NOT?: Prisma.PostWhereInput | Prisma.PostWhereInput[]
   id?: Prisma.StringFilter<"Post"> | string
   title?: Prisma.StringFilter<"Post"> | string
+  tags?: Prisma.StringNullableListFilter<"Post">
   content?: Prisma.StringFilter<"Post"> | string
   visibility?: Prisma.EnumVisibilityFilter<"Post"> | $Enums.Visibility
   authorId?: Prisma.StringFilter<"Post"> | string
@@ -210,11 +214,15 @@ export type PostWhereInput = {
   category?: Prisma.XOR<Prisma.CategoryNullableScalarRelationFilter, Prisma.CategoryWhereInput> | null
   drafts?: Prisma.PostDraftListRelationFilter
   images?: Prisma.PostImageListRelationFilter
+  likes?: Prisma.PostLikeListRelationFilter
+  comments?: Prisma.CommentListRelationFilter
+  views?: Prisma.PostViewListRelationFilter
 }
 
 export type PostOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
+  tags?: Prisma.SortOrder
   content?: Prisma.SortOrder
   visibility?: Prisma.SortOrder
   authorId?: Prisma.SortOrder
@@ -225,6 +233,9 @@ export type PostOrderByWithRelationInput = {
   category?: Prisma.CategoryOrderByWithRelationInput
   drafts?: Prisma.PostDraftOrderByRelationAggregateInput
   images?: Prisma.PostImageOrderByRelationAggregateInput
+  likes?: Prisma.PostLikeOrderByRelationAggregateInput
+  comments?: Prisma.CommentOrderByRelationAggregateInput
+  views?: Prisma.PostViewOrderByRelationAggregateInput
 }
 
 export type PostWhereUniqueInput = Prisma.AtLeast<{
@@ -233,6 +244,7 @@ export type PostWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.PostWhereInput[]
   NOT?: Prisma.PostWhereInput | Prisma.PostWhereInput[]
   title?: Prisma.StringFilter<"Post"> | string
+  tags?: Prisma.StringNullableListFilter<"Post">
   content?: Prisma.StringFilter<"Post"> | string
   visibility?: Prisma.EnumVisibilityFilter<"Post"> | $Enums.Visibility
   authorId?: Prisma.StringFilter<"Post"> | string
@@ -243,11 +255,15 @@ export type PostWhereUniqueInput = Prisma.AtLeast<{
   category?: Prisma.XOR<Prisma.CategoryNullableScalarRelationFilter, Prisma.CategoryWhereInput> | null
   drafts?: Prisma.PostDraftListRelationFilter
   images?: Prisma.PostImageListRelationFilter
+  likes?: Prisma.PostLikeListRelationFilter
+  comments?: Prisma.CommentListRelationFilter
+  views?: Prisma.PostViewListRelationFilter
 }, "id">
 
 export type PostOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
+  tags?: Prisma.SortOrder
   content?: Prisma.SortOrder
   visibility?: Prisma.SortOrder
   authorId?: Prisma.SortOrder
@@ -265,6 +281,7 @@ export type PostScalarWhereWithAggregatesInput = {
   NOT?: Prisma.PostScalarWhereWithAggregatesInput | Prisma.PostScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Post"> | string
   title?: Prisma.StringWithAggregatesFilter<"Post"> | string
+  tags?: Prisma.StringNullableListFilter<"Post">
   content?: Prisma.StringWithAggregatesFilter<"Post"> | string
   visibility?: Prisma.EnumVisibilityWithAggregatesFilter<"Post"> | $Enums.Visibility
   authorId?: Prisma.StringWithAggregatesFilter<"Post"> | string
@@ -276,6 +293,7 @@ export type PostScalarWhereWithAggregatesInput = {
 export type PostCreateInput = {
   id?: string
   title: string
+  tags?: Prisma.PostCreatetagsInput | string[]
   content: string
   visibility?: $Enums.Visibility
   createdAt?: Date | string
@@ -284,11 +302,15 @@ export type PostCreateInput = {
   category?: Prisma.CategoryCreateNestedOneWithoutPostsInput
   drafts?: Prisma.PostDraftCreateNestedManyWithoutPostInput
   images?: Prisma.PostImageCreateNestedManyWithoutPostInput
+  likes?: Prisma.PostLikeCreateNestedManyWithoutPostInput
+  comments?: Prisma.CommentCreateNestedManyWithoutPostInput
+  views?: Prisma.PostViewCreateNestedManyWithoutPostInput
 }
 
 export type PostUncheckedCreateInput = {
   id?: string
   title: string
+  tags?: Prisma.PostCreatetagsInput | string[]
   content: string
   visibility?: $Enums.Visibility
   authorId: string
@@ -297,11 +319,15 @@ export type PostUncheckedCreateInput = {
   updatedAt?: Date | string
   drafts?: Prisma.PostDraftUncheckedCreateNestedManyWithoutPostInput
   images?: Prisma.PostImageUncheckedCreateNestedManyWithoutPostInput
+  likes?: Prisma.PostLikeUncheckedCreateNestedManyWithoutPostInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutPostInput
+  views?: Prisma.PostViewUncheckedCreateNestedManyWithoutPostInput
 }
 
 export type PostUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
+  tags?: Prisma.PostUpdatetagsInput | string[]
   content?: Prisma.StringFieldUpdateOperationsInput | string
   visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -310,11 +336,15 @@ export type PostUpdateInput = {
   category?: Prisma.CategoryUpdateOneWithoutPostsNestedInput
   drafts?: Prisma.PostDraftUpdateManyWithoutPostNestedInput
   images?: Prisma.PostImageUpdateManyWithoutPostNestedInput
+  likes?: Prisma.PostLikeUpdateManyWithoutPostNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutPostNestedInput
+  views?: Prisma.PostViewUpdateManyWithoutPostNestedInput
 }
 
 export type PostUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
+  tags?: Prisma.PostUpdatetagsInput | string[]
   content?: Prisma.StringFieldUpdateOperationsInput | string
   visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
   authorId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -323,11 +353,15 @@ export type PostUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   drafts?: Prisma.PostDraftUncheckedUpdateManyWithoutPostNestedInput
   images?: Prisma.PostImageUncheckedUpdateManyWithoutPostNestedInput
+  likes?: Prisma.PostLikeUncheckedUpdateManyWithoutPostNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutPostNestedInput
+  views?: Prisma.PostViewUncheckedUpdateManyWithoutPostNestedInput
 }
 
 export type PostCreateManyInput = {
   id?: string
   title: string
+  tags?: Prisma.PostCreatetagsInput | string[]
   content: string
   visibility?: $Enums.Visibility
   authorId: string
@@ -339,6 +373,7 @@ export type PostCreateManyInput = {
 export type PostUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
+  tags?: Prisma.PostUpdatetagsInput | string[]
   content?: Prisma.StringFieldUpdateOperationsInput | string
   visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -348,6 +383,7 @@ export type PostUpdateManyMutationInput = {
 export type PostUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
+  tags?: Prisma.PostUpdatetagsInput | string[]
   content?: Prisma.StringFieldUpdateOperationsInput | string
   visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
   authorId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -366,9 +402,18 @@ export type PostOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type StringNullableListFilter<$PrismaModel = never> = {
+  equals?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel> | null
+  has?: string | Prisma.StringFieldRefInput<$PrismaModel> | null
+  hasEvery?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
+  hasSome?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
+  isEmpty?: boolean
+}
+
 export type PostCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
+  tags?: Prisma.SortOrder
   content?: Prisma.SortOrder
   visibility?: Prisma.SortOrder
   authorId?: Prisma.SortOrder
@@ -493,6 +538,15 @@ export type PostUncheckedUpdateManyWithoutCategoryNestedInput = {
   deleteMany?: Prisma.PostScalarWhereInput | Prisma.PostScalarWhereInput[]
 }
 
+export type PostCreatetagsInput = {
+  set: string[]
+}
+
+export type PostUpdatetagsInput = {
+  set?: string[]
+  push?: string | string[]
+}
+
 export type EnumVisibilityFieldUpdateOperationsInput = {
   set?: $Enums.Visibility
 }
@@ -513,6 +567,48 @@ export type PostUpdateOneWithoutDraftsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PostUpdateToOneWithWhereWithoutDraftsInput, Prisma.PostUpdateWithoutDraftsInput>, Prisma.PostUncheckedUpdateWithoutDraftsInput>
 }
 
+export type PostCreateNestedOneWithoutLikesInput = {
+  create?: Prisma.XOR<Prisma.PostCreateWithoutLikesInput, Prisma.PostUncheckedCreateWithoutLikesInput>
+  connectOrCreate?: Prisma.PostCreateOrConnectWithoutLikesInput
+  connect?: Prisma.PostWhereUniqueInput
+}
+
+export type PostUpdateOneRequiredWithoutLikesNestedInput = {
+  create?: Prisma.XOR<Prisma.PostCreateWithoutLikesInput, Prisma.PostUncheckedCreateWithoutLikesInput>
+  connectOrCreate?: Prisma.PostCreateOrConnectWithoutLikesInput
+  upsert?: Prisma.PostUpsertWithoutLikesInput
+  connect?: Prisma.PostWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PostUpdateToOneWithWhereWithoutLikesInput, Prisma.PostUpdateWithoutLikesInput>, Prisma.PostUncheckedUpdateWithoutLikesInput>
+}
+
+export type PostCreateNestedOneWithoutCommentsInput = {
+  create?: Prisma.XOR<Prisma.PostCreateWithoutCommentsInput, Prisma.PostUncheckedCreateWithoutCommentsInput>
+  connectOrCreate?: Prisma.PostCreateOrConnectWithoutCommentsInput
+  connect?: Prisma.PostWhereUniqueInput
+}
+
+export type PostUpdateOneRequiredWithoutCommentsNestedInput = {
+  create?: Prisma.XOR<Prisma.PostCreateWithoutCommentsInput, Prisma.PostUncheckedCreateWithoutCommentsInput>
+  connectOrCreate?: Prisma.PostCreateOrConnectWithoutCommentsInput
+  upsert?: Prisma.PostUpsertWithoutCommentsInput
+  connect?: Prisma.PostWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PostUpdateToOneWithWhereWithoutCommentsInput, Prisma.PostUpdateWithoutCommentsInput>, Prisma.PostUncheckedUpdateWithoutCommentsInput>
+}
+
+export type PostCreateNestedOneWithoutViewsInput = {
+  create?: Prisma.XOR<Prisma.PostCreateWithoutViewsInput, Prisma.PostUncheckedCreateWithoutViewsInput>
+  connectOrCreate?: Prisma.PostCreateOrConnectWithoutViewsInput
+  connect?: Prisma.PostWhereUniqueInput
+}
+
+export type PostUpdateOneRequiredWithoutViewsNestedInput = {
+  create?: Prisma.XOR<Prisma.PostCreateWithoutViewsInput, Prisma.PostUncheckedCreateWithoutViewsInput>
+  connectOrCreate?: Prisma.PostCreateOrConnectWithoutViewsInput
+  upsert?: Prisma.PostUpsertWithoutViewsInput
+  connect?: Prisma.PostWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PostUpdateToOneWithWhereWithoutViewsInput, Prisma.PostUpdateWithoutViewsInput>, Prisma.PostUncheckedUpdateWithoutViewsInput>
+}
+
 export type PostCreateNestedOneWithoutImagesInput = {
   create?: Prisma.XOR<Prisma.PostCreateWithoutImagesInput, Prisma.PostUncheckedCreateWithoutImagesInput>
   connectOrCreate?: Prisma.PostCreateOrConnectWithoutImagesInput
@@ -530,6 +626,7 @@ export type PostUpdateOneRequiredWithoutImagesNestedInput = {
 export type PostCreateWithoutAuthorInput = {
   id?: string
   title: string
+  tags?: Prisma.PostCreatetagsInput | string[]
   content: string
   visibility?: $Enums.Visibility
   createdAt?: Date | string
@@ -537,11 +634,15 @@ export type PostCreateWithoutAuthorInput = {
   category?: Prisma.CategoryCreateNestedOneWithoutPostsInput
   drafts?: Prisma.PostDraftCreateNestedManyWithoutPostInput
   images?: Prisma.PostImageCreateNestedManyWithoutPostInput
+  likes?: Prisma.PostLikeCreateNestedManyWithoutPostInput
+  comments?: Prisma.CommentCreateNestedManyWithoutPostInput
+  views?: Prisma.PostViewCreateNestedManyWithoutPostInput
 }
 
 export type PostUncheckedCreateWithoutAuthorInput = {
   id?: string
   title: string
+  tags?: Prisma.PostCreatetagsInput | string[]
   content: string
   visibility?: $Enums.Visibility
   categoryId?: string | null
@@ -549,6 +650,9 @@ export type PostUncheckedCreateWithoutAuthorInput = {
   updatedAt?: Date | string
   drafts?: Prisma.PostDraftUncheckedCreateNestedManyWithoutPostInput
   images?: Prisma.PostImageUncheckedCreateNestedManyWithoutPostInput
+  likes?: Prisma.PostLikeUncheckedCreateNestedManyWithoutPostInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutPostInput
+  views?: Prisma.PostViewUncheckedCreateNestedManyWithoutPostInput
 }
 
 export type PostCreateOrConnectWithoutAuthorInput = {
@@ -583,6 +687,7 @@ export type PostScalarWhereInput = {
   NOT?: Prisma.PostScalarWhereInput | Prisma.PostScalarWhereInput[]
   id?: Prisma.StringFilter<"Post"> | string
   title?: Prisma.StringFilter<"Post"> | string
+  tags?: Prisma.StringNullableListFilter<"Post">
   content?: Prisma.StringFilter<"Post"> | string
   visibility?: Prisma.EnumVisibilityFilter<"Post"> | $Enums.Visibility
   authorId?: Prisma.StringFilter<"Post"> | string
@@ -594,6 +699,7 @@ export type PostScalarWhereInput = {
 export type PostCreateWithoutCategoryInput = {
   id?: string
   title: string
+  tags?: Prisma.PostCreatetagsInput | string[]
   content: string
   visibility?: $Enums.Visibility
   createdAt?: Date | string
@@ -601,11 +707,15 @@ export type PostCreateWithoutCategoryInput = {
   author: Prisma.UserCreateNestedOneWithoutPostsInput
   drafts?: Prisma.PostDraftCreateNestedManyWithoutPostInput
   images?: Prisma.PostImageCreateNestedManyWithoutPostInput
+  likes?: Prisma.PostLikeCreateNestedManyWithoutPostInput
+  comments?: Prisma.CommentCreateNestedManyWithoutPostInput
+  views?: Prisma.PostViewCreateNestedManyWithoutPostInput
 }
 
 export type PostUncheckedCreateWithoutCategoryInput = {
   id?: string
   title: string
+  tags?: Prisma.PostCreatetagsInput | string[]
   content: string
   visibility?: $Enums.Visibility
   authorId: string
@@ -613,6 +723,9 @@ export type PostUncheckedCreateWithoutCategoryInput = {
   updatedAt?: Date | string
   drafts?: Prisma.PostDraftUncheckedCreateNestedManyWithoutPostInput
   images?: Prisma.PostImageUncheckedCreateNestedManyWithoutPostInput
+  likes?: Prisma.PostLikeUncheckedCreateNestedManyWithoutPostInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutPostInput
+  views?: Prisma.PostViewUncheckedCreateNestedManyWithoutPostInput
 }
 
 export type PostCreateOrConnectWithoutCategoryInput = {
@@ -644,6 +757,7 @@ export type PostUpdateManyWithWhereWithoutCategoryInput = {
 export type PostCreateWithoutDraftsInput = {
   id?: string
   title: string
+  tags?: Prisma.PostCreatetagsInput | string[]
   content: string
   visibility?: $Enums.Visibility
   createdAt?: Date | string
@@ -651,11 +765,15 @@ export type PostCreateWithoutDraftsInput = {
   author: Prisma.UserCreateNestedOneWithoutPostsInput
   category?: Prisma.CategoryCreateNestedOneWithoutPostsInput
   images?: Prisma.PostImageCreateNestedManyWithoutPostInput
+  likes?: Prisma.PostLikeCreateNestedManyWithoutPostInput
+  comments?: Prisma.CommentCreateNestedManyWithoutPostInput
+  views?: Prisma.PostViewCreateNestedManyWithoutPostInput
 }
 
 export type PostUncheckedCreateWithoutDraftsInput = {
   id?: string
   title: string
+  tags?: Prisma.PostCreatetagsInput | string[]
   content: string
   visibility?: $Enums.Visibility
   authorId: string
@@ -663,6 +781,9 @@ export type PostUncheckedCreateWithoutDraftsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   images?: Prisma.PostImageUncheckedCreateNestedManyWithoutPostInput
+  likes?: Prisma.PostLikeUncheckedCreateNestedManyWithoutPostInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutPostInput
+  views?: Prisma.PostViewUncheckedCreateNestedManyWithoutPostInput
 }
 
 export type PostCreateOrConnectWithoutDraftsInput = {
@@ -684,6 +805,7 @@ export type PostUpdateToOneWithWhereWithoutDraftsInput = {
 export type PostUpdateWithoutDraftsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
+  tags?: Prisma.PostUpdatetagsInput | string[]
   content?: Prisma.StringFieldUpdateOperationsInput | string
   visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -691,11 +813,15 @@ export type PostUpdateWithoutDraftsInput = {
   author?: Prisma.UserUpdateOneRequiredWithoutPostsNestedInput
   category?: Prisma.CategoryUpdateOneWithoutPostsNestedInput
   images?: Prisma.PostImageUpdateManyWithoutPostNestedInput
+  likes?: Prisma.PostLikeUpdateManyWithoutPostNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutPostNestedInput
+  views?: Prisma.PostViewUpdateManyWithoutPostNestedInput
 }
 
 export type PostUncheckedUpdateWithoutDraftsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
+  tags?: Prisma.PostUpdatetagsInput | string[]
   content?: Prisma.StringFieldUpdateOperationsInput | string
   visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
   authorId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -703,11 +829,15 @@ export type PostUncheckedUpdateWithoutDraftsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   images?: Prisma.PostImageUncheckedUpdateManyWithoutPostNestedInput
+  likes?: Prisma.PostLikeUncheckedUpdateManyWithoutPostNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutPostNestedInput
+  views?: Prisma.PostViewUncheckedUpdateManyWithoutPostNestedInput
 }
 
-export type PostCreateWithoutImagesInput = {
+export type PostCreateWithoutLikesInput = {
   id?: string
   title: string
+  tags?: Prisma.PostCreatetagsInput | string[]
   content: string
   visibility?: $Enums.Visibility
   createdAt?: Date | string
@@ -715,11 +845,15 @@ export type PostCreateWithoutImagesInput = {
   author: Prisma.UserCreateNestedOneWithoutPostsInput
   category?: Prisma.CategoryCreateNestedOneWithoutPostsInput
   drafts?: Prisma.PostDraftCreateNestedManyWithoutPostInput
+  images?: Prisma.PostImageCreateNestedManyWithoutPostInput
+  comments?: Prisma.CommentCreateNestedManyWithoutPostInput
+  views?: Prisma.PostViewCreateNestedManyWithoutPostInput
 }
 
-export type PostUncheckedCreateWithoutImagesInput = {
+export type PostUncheckedCreateWithoutLikesInput = {
   id?: string
   title: string
+  tags?: Prisma.PostCreatetagsInput | string[]
   content: string
   visibility?: $Enums.Visibility
   authorId: string
@@ -727,6 +861,249 @@ export type PostUncheckedCreateWithoutImagesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   drafts?: Prisma.PostDraftUncheckedCreateNestedManyWithoutPostInput
+  images?: Prisma.PostImageUncheckedCreateNestedManyWithoutPostInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutPostInput
+  views?: Prisma.PostViewUncheckedCreateNestedManyWithoutPostInput
+}
+
+export type PostCreateOrConnectWithoutLikesInput = {
+  where: Prisma.PostWhereUniqueInput
+  create: Prisma.XOR<Prisma.PostCreateWithoutLikesInput, Prisma.PostUncheckedCreateWithoutLikesInput>
+}
+
+export type PostUpsertWithoutLikesInput = {
+  update: Prisma.XOR<Prisma.PostUpdateWithoutLikesInput, Prisma.PostUncheckedUpdateWithoutLikesInput>
+  create: Prisma.XOR<Prisma.PostCreateWithoutLikesInput, Prisma.PostUncheckedCreateWithoutLikesInput>
+  where?: Prisma.PostWhereInput
+}
+
+export type PostUpdateToOneWithWhereWithoutLikesInput = {
+  where?: Prisma.PostWhereInput
+  data: Prisma.XOR<Prisma.PostUpdateWithoutLikesInput, Prisma.PostUncheckedUpdateWithoutLikesInput>
+}
+
+export type PostUpdateWithoutLikesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  tags?: Prisma.PostUpdatetagsInput | string[]
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  author?: Prisma.UserUpdateOneRequiredWithoutPostsNestedInput
+  category?: Prisma.CategoryUpdateOneWithoutPostsNestedInput
+  drafts?: Prisma.PostDraftUpdateManyWithoutPostNestedInput
+  images?: Prisma.PostImageUpdateManyWithoutPostNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutPostNestedInput
+  views?: Prisma.PostViewUpdateManyWithoutPostNestedInput
+}
+
+export type PostUncheckedUpdateWithoutLikesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  tags?: Prisma.PostUpdatetagsInput | string[]
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
+  authorId?: Prisma.StringFieldUpdateOperationsInput | string
+  categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  drafts?: Prisma.PostDraftUncheckedUpdateManyWithoutPostNestedInput
+  images?: Prisma.PostImageUncheckedUpdateManyWithoutPostNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutPostNestedInput
+  views?: Prisma.PostViewUncheckedUpdateManyWithoutPostNestedInput
+}
+
+export type PostCreateWithoutCommentsInput = {
+  id?: string
+  title: string
+  tags?: Prisma.PostCreatetagsInput | string[]
+  content: string
+  visibility?: $Enums.Visibility
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  author: Prisma.UserCreateNestedOneWithoutPostsInput
+  category?: Prisma.CategoryCreateNestedOneWithoutPostsInput
+  drafts?: Prisma.PostDraftCreateNestedManyWithoutPostInput
+  images?: Prisma.PostImageCreateNestedManyWithoutPostInput
+  likes?: Prisma.PostLikeCreateNestedManyWithoutPostInput
+  views?: Prisma.PostViewCreateNestedManyWithoutPostInput
+}
+
+export type PostUncheckedCreateWithoutCommentsInput = {
+  id?: string
+  title: string
+  tags?: Prisma.PostCreatetagsInput | string[]
+  content: string
+  visibility?: $Enums.Visibility
+  authorId: string
+  categoryId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  drafts?: Prisma.PostDraftUncheckedCreateNestedManyWithoutPostInput
+  images?: Prisma.PostImageUncheckedCreateNestedManyWithoutPostInput
+  likes?: Prisma.PostLikeUncheckedCreateNestedManyWithoutPostInput
+  views?: Prisma.PostViewUncheckedCreateNestedManyWithoutPostInput
+}
+
+export type PostCreateOrConnectWithoutCommentsInput = {
+  where: Prisma.PostWhereUniqueInput
+  create: Prisma.XOR<Prisma.PostCreateWithoutCommentsInput, Prisma.PostUncheckedCreateWithoutCommentsInput>
+}
+
+export type PostUpsertWithoutCommentsInput = {
+  update: Prisma.XOR<Prisma.PostUpdateWithoutCommentsInput, Prisma.PostUncheckedUpdateWithoutCommentsInput>
+  create: Prisma.XOR<Prisma.PostCreateWithoutCommentsInput, Prisma.PostUncheckedCreateWithoutCommentsInput>
+  where?: Prisma.PostWhereInput
+}
+
+export type PostUpdateToOneWithWhereWithoutCommentsInput = {
+  where?: Prisma.PostWhereInput
+  data: Prisma.XOR<Prisma.PostUpdateWithoutCommentsInput, Prisma.PostUncheckedUpdateWithoutCommentsInput>
+}
+
+export type PostUpdateWithoutCommentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  tags?: Prisma.PostUpdatetagsInput | string[]
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  author?: Prisma.UserUpdateOneRequiredWithoutPostsNestedInput
+  category?: Prisma.CategoryUpdateOneWithoutPostsNestedInput
+  drafts?: Prisma.PostDraftUpdateManyWithoutPostNestedInput
+  images?: Prisma.PostImageUpdateManyWithoutPostNestedInput
+  likes?: Prisma.PostLikeUpdateManyWithoutPostNestedInput
+  views?: Prisma.PostViewUpdateManyWithoutPostNestedInput
+}
+
+export type PostUncheckedUpdateWithoutCommentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  tags?: Prisma.PostUpdatetagsInput | string[]
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
+  authorId?: Prisma.StringFieldUpdateOperationsInput | string
+  categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  drafts?: Prisma.PostDraftUncheckedUpdateManyWithoutPostNestedInput
+  images?: Prisma.PostImageUncheckedUpdateManyWithoutPostNestedInput
+  likes?: Prisma.PostLikeUncheckedUpdateManyWithoutPostNestedInput
+  views?: Prisma.PostViewUncheckedUpdateManyWithoutPostNestedInput
+}
+
+export type PostCreateWithoutViewsInput = {
+  id?: string
+  title: string
+  tags?: Prisma.PostCreatetagsInput | string[]
+  content: string
+  visibility?: $Enums.Visibility
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  author: Prisma.UserCreateNestedOneWithoutPostsInput
+  category?: Prisma.CategoryCreateNestedOneWithoutPostsInput
+  drafts?: Prisma.PostDraftCreateNestedManyWithoutPostInput
+  images?: Prisma.PostImageCreateNestedManyWithoutPostInput
+  likes?: Prisma.PostLikeCreateNestedManyWithoutPostInput
+  comments?: Prisma.CommentCreateNestedManyWithoutPostInput
+}
+
+export type PostUncheckedCreateWithoutViewsInput = {
+  id?: string
+  title: string
+  tags?: Prisma.PostCreatetagsInput | string[]
+  content: string
+  visibility?: $Enums.Visibility
+  authorId: string
+  categoryId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  drafts?: Prisma.PostDraftUncheckedCreateNestedManyWithoutPostInput
+  images?: Prisma.PostImageUncheckedCreateNestedManyWithoutPostInput
+  likes?: Prisma.PostLikeUncheckedCreateNestedManyWithoutPostInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutPostInput
+}
+
+export type PostCreateOrConnectWithoutViewsInput = {
+  where: Prisma.PostWhereUniqueInput
+  create: Prisma.XOR<Prisma.PostCreateWithoutViewsInput, Prisma.PostUncheckedCreateWithoutViewsInput>
+}
+
+export type PostUpsertWithoutViewsInput = {
+  update: Prisma.XOR<Prisma.PostUpdateWithoutViewsInput, Prisma.PostUncheckedUpdateWithoutViewsInput>
+  create: Prisma.XOR<Prisma.PostCreateWithoutViewsInput, Prisma.PostUncheckedCreateWithoutViewsInput>
+  where?: Prisma.PostWhereInput
+}
+
+export type PostUpdateToOneWithWhereWithoutViewsInput = {
+  where?: Prisma.PostWhereInput
+  data: Prisma.XOR<Prisma.PostUpdateWithoutViewsInput, Prisma.PostUncheckedUpdateWithoutViewsInput>
+}
+
+export type PostUpdateWithoutViewsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  tags?: Prisma.PostUpdatetagsInput | string[]
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  author?: Prisma.UserUpdateOneRequiredWithoutPostsNestedInput
+  category?: Prisma.CategoryUpdateOneWithoutPostsNestedInput
+  drafts?: Prisma.PostDraftUpdateManyWithoutPostNestedInput
+  images?: Prisma.PostImageUpdateManyWithoutPostNestedInput
+  likes?: Prisma.PostLikeUpdateManyWithoutPostNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutPostNestedInput
+}
+
+export type PostUncheckedUpdateWithoutViewsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  tags?: Prisma.PostUpdatetagsInput | string[]
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
+  authorId?: Prisma.StringFieldUpdateOperationsInput | string
+  categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  drafts?: Prisma.PostDraftUncheckedUpdateManyWithoutPostNestedInput
+  images?: Prisma.PostImageUncheckedUpdateManyWithoutPostNestedInput
+  likes?: Prisma.PostLikeUncheckedUpdateManyWithoutPostNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutPostNestedInput
+}
+
+export type PostCreateWithoutImagesInput = {
+  id?: string
+  title: string
+  tags?: Prisma.PostCreatetagsInput | string[]
+  content: string
+  visibility?: $Enums.Visibility
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  author: Prisma.UserCreateNestedOneWithoutPostsInput
+  category?: Prisma.CategoryCreateNestedOneWithoutPostsInput
+  drafts?: Prisma.PostDraftCreateNestedManyWithoutPostInput
+  likes?: Prisma.PostLikeCreateNestedManyWithoutPostInput
+  comments?: Prisma.CommentCreateNestedManyWithoutPostInput
+  views?: Prisma.PostViewCreateNestedManyWithoutPostInput
+}
+
+export type PostUncheckedCreateWithoutImagesInput = {
+  id?: string
+  title: string
+  tags?: Prisma.PostCreatetagsInput | string[]
+  content: string
+  visibility?: $Enums.Visibility
+  authorId: string
+  categoryId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  drafts?: Prisma.PostDraftUncheckedCreateNestedManyWithoutPostInput
+  likes?: Prisma.PostLikeUncheckedCreateNestedManyWithoutPostInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutPostInput
+  views?: Prisma.PostViewUncheckedCreateNestedManyWithoutPostInput
 }
 
 export type PostCreateOrConnectWithoutImagesInput = {
@@ -748,6 +1125,7 @@ export type PostUpdateToOneWithWhereWithoutImagesInput = {
 export type PostUpdateWithoutImagesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
+  tags?: Prisma.PostUpdatetagsInput | string[]
   content?: Prisma.StringFieldUpdateOperationsInput | string
   visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -755,11 +1133,15 @@ export type PostUpdateWithoutImagesInput = {
   author?: Prisma.UserUpdateOneRequiredWithoutPostsNestedInput
   category?: Prisma.CategoryUpdateOneWithoutPostsNestedInput
   drafts?: Prisma.PostDraftUpdateManyWithoutPostNestedInput
+  likes?: Prisma.PostLikeUpdateManyWithoutPostNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutPostNestedInput
+  views?: Prisma.PostViewUpdateManyWithoutPostNestedInput
 }
 
 export type PostUncheckedUpdateWithoutImagesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
+  tags?: Prisma.PostUpdatetagsInput | string[]
   content?: Prisma.StringFieldUpdateOperationsInput | string
   visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
   authorId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -767,11 +1149,15 @@ export type PostUncheckedUpdateWithoutImagesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   drafts?: Prisma.PostDraftUncheckedUpdateManyWithoutPostNestedInput
+  likes?: Prisma.PostLikeUncheckedUpdateManyWithoutPostNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutPostNestedInput
+  views?: Prisma.PostViewUncheckedUpdateManyWithoutPostNestedInput
 }
 
 export type PostCreateManyAuthorInput = {
   id?: string
   title: string
+  tags?: Prisma.PostCreatetagsInput | string[]
   content: string
   visibility?: $Enums.Visibility
   categoryId?: string | null
@@ -782,6 +1168,7 @@ export type PostCreateManyAuthorInput = {
 export type PostUpdateWithoutAuthorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
+  tags?: Prisma.PostUpdatetagsInput | string[]
   content?: Prisma.StringFieldUpdateOperationsInput | string
   visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -789,11 +1176,15 @@ export type PostUpdateWithoutAuthorInput = {
   category?: Prisma.CategoryUpdateOneWithoutPostsNestedInput
   drafts?: Prisma.PostDraftUpdateManyWithoutPostNestedInput
   images?: Prisma.PostImageUpdateManyWithoutPostNestedInput
+  likes?: Prisma.PostLikeUpdateManyWithoutPostNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutPostNestedInput
+  views?: Prisma.PostViewUpdateManyWithoutPostNestedInput
 }
 
 export type PostUncheckedUpdateWithoutAuthorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
+  tags?: Prisma.PostUpdatetagsInput | string[]
   content?: Prisma.StringFieldUpdateOperationsInput | string
   visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
   categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -801,11 +1192,15 @@ export type PostUncheckedUpdateWithoutAuthorInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   drafts?: Prisma.PostDraftUncheckedUpdateManyWithoutPostNestedInput
   images?: Prisma.PostImageUncheckedUpdateManyWithoutPostNestedInput
+  likes?: Prisma.PostLikeUncheckedUpdateManyWithoutPostNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutPostNestedInput
+  views?: Prisma.PostViewUncheckedUpdateManyWithoutPostNestedInput
 }
 
 export type PostUncheckedUpdateManyWithoutAuthorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
+  tags?: Prisma.PostUpdatetagsInput | string[]
   content?: Prisma.StringFieldUpdateOperationsInput | string
   visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
   categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -816,6 +1211,7 @@ export type PostUncheckedUpdateManyWithoutAuthorInput = {
 export type PostCreateManyCategoryInput = {
   id?: string
   title: string
+  tags?: Prisma.PostCreatetagsInput | string[]
   content: string
   visibility?: $Enums.Visibility
   authorId: string
@@ -826,6 +1222,7 @@ export type PostCreateManyCategoryInput = {
 export type PostUpdateWithoutCategoryInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
+  tags?: Prisma.PostUpdatetagsInput | string[]
   content?: Prisma.StringFieldUpdateOperationsInput | string
   visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -833,11 +1230,15 @@ export type PostUpdateWithoutCategoryInput = {
   author?: Prisma.UserUpdateOneRequiredWithoutPostsNestedInput
   drafts?: Prisma.PostDraftUpdateManyWithoutPostNestedInput
   images?: Prisma.PostImageUpdateManyWithoutPostNestedInput
+  likes?: Prisma.PostLikeUpdateManyWithoutPostNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutPostNestedInput
+  views?: Prisma.PostViewUpdateManyWithoutPostNestedInput
 }
 
 export type PostUncheckedUpdateWithoutCategoryInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
+  tags?: Prisma.PostUpdatetagsInput | string[]
   content?: Prisma.StringFieldUpdateOperationsInput | string
   visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
   authorId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -845,11 +1246,15 @@ export type PostUncheckedUpdateWithoutCategoryInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   drafts?: Prisma.PostDraftUncheckedUpdateManyWithoutPostNestedInput
   images?: Prisma.PostImageUncheckedUpdateManyWithoutPostNestedInput
+  likes?: Prisma.PostLikeUncheckedUpdateManyWithoutPostNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutPostNestedInput
+  views?: Prisma.PostViewUncheckedUpdateManyWithoutPostNestedInput
 }
 
 export type PostUncheckedUpdateManyWithoutCategoryInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
+  tags?: Prisma.PostUpdatetagsInput | string[]
   content?: Prisma.StringFieldUpdateOperationsInput | string
   visibility?: Prisma.EnumVisibilityFieldUpdateOperationsInput | $Enums.Visibility
   authorId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -865,11 +1270,17 @@ export type PostUncheckedUpdateManyWithoutCategoryInput = {
 export type PostCountOutputType = {
   drafts: number
   images: number
+  likes: number
+  comments: number
+  views: number
 }
 
 export type PostCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   drafts?: boolean | PostCountOutputTypeCountDraftsArgs
   images?: boolean | PostCountOutputTypeCountImagesArgs
+  likes?: boolean | PostCountOutputTypeCountLikesArgs
+  comments?: boolean | PostCountOutputTypeCountCommentsArgs
+  views?: boolean | PostCountOutputTypeCountViewsArgs
 }
 
 /**
@@ -896,10 +1307,32 @@ export type PostCountOutputTypeCountImagesArgs<ExtArgs extends runtime.Types.Ext
   where?: Prisma.PostImageWhereInput
 }
 
+/**
+ * PostCountOutputType without action
+ */
+export type PostCountOutputTypeCountLikesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PostLikeWhereInput
+}
+
+/**
+ * PostCountOutputType without action
+ */
+export type PostCountOutputTypeCountCommentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CommentWhereInput
+}
+
+/**
+ * PostCountOutputType without action
+ */
+export type PostCountOutputTypeCountViewsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PostViewWhereInput
+}
+
 
 export type PostSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   title?: boolean
+  tags?: boolean
   content?: boolean
   visibility?: boolean
   authorId?: boolean
@@ -910,12 +1343,16 @@ export type PostSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   category?: boolean | Prisma.Post$categoryArgs<ExtArgs>
   drafts?: boolean | Prisma.Post$draftsArgs<ExtArgs>
   images?: boolean | Prisma.Post$imagesArgs<ExtArgs>
+  likes?: boolean | Prisma.Post$likesArgs<ExtArgs>
+  comments?: boolean | Prisma.Post$commentsArgs<ExtArgs>
+  views?: boolean | Prisma.Post$viewsArgs<ExtArgs>
   _count?: boolean | Prisma.PostCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["post"]>
 
 export type PostSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   title?: boolean
+  tags?: boolean
   content?: boolean
   visibility?: boolean
   authorId?: boolean
@@ -929,6 +1366,7 @@ export type PostSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
 export type PostSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   title?: boolean
+  tags?: boolean
   content?: boolean
   visibility?: boolean
   authorId?: boolean
@@ -942,6 +1380,7 @@ export type PostSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
 export type PostSelectScalar = {
   id?: boolean
   title?: boolean
+  tags?: boolean
   content?: boolean
   visibility?: boolean
   authorId?: boolean
@@ -950,12 +1389,15 @@ export type PostSelectScalar = {
   updatedAt?: boolean
 }
 
-export type PostOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "content" | "visibility" | "authorId" | "categoryId" | "createdAt" | "updatedAt", ExtArgs["result"]["post"]>
+export type PostOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "tags" | "content" | "visibility" | "authorId" | "categoryId" | "createdAt" | "updatedAt", ExtArgs["result"]["post"]>
 export type PostInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   author?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   category?: boolean | Prisma.Post$categoryArgs<ExtArgs>
   drafts?: boolean | Prisma.Post$draftsArgs<ExtArgs>
   images?: boolean | Prisma.Post$imagesArgs<ExtArgs>
+  likes?: boolean | Prisma.Post$likesArgs<ExtArgs>
+  comments?: boolean | Prisma.Post$commentsArgs<ExtArgs>
+  views?: boolean | Prisma.Post$viewsArgs<ExtArgs>
   _count?: boolean | Prisma.PostCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PostIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -974,10 +1416,14 @@ export type $PostPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     category: Prisma.$CategoryPayload<ExtArgs> | null
     drafts: Prisma.$PostDraftPayload<ExtArgs>[]
     images: Prisma.$PostImagePayload<ExtArgs>[]
+    likes: Prisma.$PostLikePayload<ExtArgs>[]
+    comments: Prisma.$CommentPayload<ExtArgs>[]
+    views: Prisma.$PostViewPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     title: string
+    tags: string[]
     content: string
     visibility: $Enums.Visibility
     authorId: string
@@ -1382,6 +1828,9 @@ export interface Prisma__PostClient<T, Null = never, ExtArgs extends runtime.Typ
   category<T extends Prisma.Post$categoryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Post$categoryArgs<ExtArgs>>): Prisma.Prisma__CategoryClient<runtime.Types.Result.GetResult<Prisma.$CategoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   drafts<T extends Prisma.Post$draftsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Post$draftsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PostDraftPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   images<T extends Prisma.Post$imagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Post$imagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PostImagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  likes<T extends Prisma.Post$likesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Post$likesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PostLikePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  comments<T extends Prisma.Post$commentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Post$commentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  views<T extends Prisma.Post$viewsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Post$viewsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PostViewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1413,6 +1862,7 @@ export interface Prisma__PostClient<T, Null = never, ExtArgs extends runtime.Typ
 export interface PostFieldRefs {
   readonly id: Prisma.FieldRef<"Post", 'String'>
   readonly title: Prisma.FieldRef<"Post", 'String'>
+  readonly tags: Prisma.FieldRef<"Post", 'String[]'>
   readonly content: Prisma.FieldRef<"Post", 'String'>
   readonly visibility: Prisma.FieldRef<"Post", 'Visibility'>
   readonly authorId: Prisma.FieldRef<"Post", 'String'>
@@ -1884,6 +2334,78 @@ export type Post$imagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
   take?: number
   skip?: number
   distinct?: Prisma.PostImageScalarFieldEnum | Prisma.PostImageScalarFieldEnum[]
+}
+
+/**
+ * Post.likes
+ */
+export type Post$likesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PostLike
+   */
+  select?: Prisma.PostLikeSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PostLike
+   */
+  omit?: Prisma.PostLikeOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PostLikeInclude<ExtArgs> | null
+  where?: Prisma.PostLikeWhereInput
+  orderBy?: Prisma.PostLikeOrderByWithRelationInput | Prisma.PostLikeOrderByWithRelationInput[]
+  cursor?: Prisma.PostLikeWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PostLikeScalarFieldEnum | Prisma.PostLikeScalarFieldEnum[]
+}
+
+/**
+ * Post.comments
+ */
+export type Post$commentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Comment
+   */
+  select?: Prisma.CommentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Comment
+   */
+  omit?: Prisma.CommentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CommentInclude<ExtArgs> | null
+  where?: Prisma.CommentWhereInput
+  orderBy?: Prisma.CommentOrderByWithRelationInput | Prisma.CommentOrderByWithRelationInput[]
+  cursor?: Prisma.CommentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CommentScalarFieldEnum | Prisma.CommentScalarFieldEnum[]
+}
+
+/**
+ * Post.views
+ */
+export type Post$viewsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PostView
+   */
+  select?: Prisma.PostViewSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PostView
+   */
+  omit?: Prisma.PostViewOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PostViewInclude<ExtArgs> | null
+  where?: Prisma.PostViewWhereInput
+  orderBy?: Prisma.PostViewOrderByWithRelationInput | Prisma.PostViewOrderByWithRelationInput[]
+  cursor?: Prisma.PostViewWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PostViewScalarFieldEnum | Prisma.PostViewScalarFieldEnum[]
 }
 
 /**

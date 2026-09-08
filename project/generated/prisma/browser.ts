@@ -48,6 +48,26 @@ export type Post = Prisma.PostModel
  */
 export type PostDraft = Prisma.PostDraftModel
 /**
+ * Model PostLike
+ * 
+ */
+export type PostLike = Prisma.PostLikeModel
+/**
+ * Model Comment
+ * 
+ */
+export type Comment = Prisma.CommentModel
+/**
+ * Model PostView
+ * 
+ */
+export type PostView = Prisma.PostViewModel
+/**
+ * Model ActionLimit
+ * 
+ */
+export type ActionLimit = Prisma.ActionLimitModel
+/**
  * Model ImageAsset
  * 
  */

@@ -28,6 +28,8 @@ model User {
   posts                  Post[]
   drafts                 PostDraft[]
   images                 ImageAsset[]
+  likes                  PostLike[]
+  comments               Comment[]
   categories             Category[]
   todos                  Todo[]
   sentFriendRequests     Friendship[] @relation("SentFriends")
@@ -87,6 +89,7 @@ model Category {
 model Post {
   id         String     @id @default(uuid())
   title      String
+  tags       String[]   @default([])
   content    String     @db.Text
   visibility Visibility @default(PUBLIC)
   authorId   String
@@ -97,6 +100,9 @@ model Post {
   updatedAt  DateTime   @updatedAt @db.Timestamptz(6)
   drafts     PostDraft[]
   images     PostImage[]
+  likes      PostLike[]
+  comments   Comment[]
+  views      PostView[]
 
   @@index([authorId])
   @@index([categoryId])
@@ -110,6 +116,7 @@ model PostDraft {
   postId     String?
   post       Post?      @relation(fields: [postId], references: [id], onDelete: Cascade)
   title      String     @default("")
+  tags       String[]   @default([])
   content    String     @db.Text
   categoryId String?
   visibility Visibility @default(PUBLIC)
@@ -120,6 +127,48 @@ model PostDraft {
 
   @@unique([userId, key])
   @@index([postId])
+}
+
+model PostLike {
+  postId    String
+  userId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  @@id([postId, userId])
+  @@index([userId, createdAt])
+}
+
+model Comment {
+  id           String   @id @default(uuid())
+  postId       String
+  post         Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  authorId     String?
+  author       User?    @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  anonymous    Boolean  @default(false)
+  nickname     String
+  passwordHash String?
+  content      String   @db.Text
+  createdAt    DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime @updatedAt @db.Timestamptz(6)
+  @@index([postId, createdAt, id])
+  @@index([authorId])
+}
+
+model PostView {
+  postId     String
+  viewerHash String
+  day        String
+  post       Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now()) @db.Timestamptz(6)
+  @@id([postId, viewerHash, day])
+  @@index([createdAt, postId])
+}
+
+model ActionLimit {
+  key     String   @id
+  count   Int      @default(1)
+  resetAt DateTime @db.Timestamptz(6)
 }
 
 model ImageAsset {
