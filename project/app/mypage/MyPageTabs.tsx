@@ -17,17 +17,19 @@ interface MyPageTabsProps {
   };
   categories: CategoryItem[];
   posts: ReactNode;
+  likes: ReactNode;
   initialTab?: string;
 }
 
-type TabType = "profile" | "posts" | "category" | "todo";
+type TabType = "profile" | "posts" | "likes" | "category" | "todo";
 
-export function MyPageTabs({ user, categories, posts, initialTab }: MyPageTabsProps) {
-  const [activeTab, setActiveTab] = useState<TabType>(initialTab === "posts" ? "posts" : "profile");
+export function MyPageTabs({ user, categories, posts, likes, initialTab }: MyPageTabsProps) {
+  const [activeTab, setActiveTab] = useState<TabType>(initialTab === "likes" ? "likes" : initialTab === "posts" ? "posts" : "profile");
 
   const tabs: { id: TabType; label: string; icon: IconName; badge?: string }[] = [
     { id: "profile", label: "프로필 설정", icon: "user" },
     { id: "posts", label: "내 포스트", icon: "file" },
+    { id: "likes", label: "내가 좋아요 한 글", icon: "bookmark" },
     { id: "category", label: "카테고리", icon: "folder", badge: String(categories.filter((category) => !category.isDivider).length) },
     { id: "todo", label: "캘린더", icon: "calendar" },
   ];
@@ -45,6 +47,7 @@ export function MyPageTabs({ user, categories, posts, initialTab }: MyPageTabsPr
       <div id="settings-panel" className="settings-panel">
         {activeTab === "profile" && <ProfileEditor user={user} />}
         {activeTab === "posts" && posts}
+        {activeTab === "likes" && likes}
         {activeTab === "category" && <CategoryManager categories={categories} />}
         {activeTab === "todo" && <TodoCalendar />}
       </div>

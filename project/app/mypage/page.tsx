@@ -1,5 +1,6 @@
 import Link from "next/link";
-import Image from "next/image";
+import { Avatar } from "@/app/components/Avatar";
+import { LikedPosts } from "@/app/components/LikedPosts";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
@@ -51,19 +52,7 @@ export default async function MyPage({ searchParams }: { searchParams: Promise<{
         {/* 상단 프로필 요약 카드 */}
         <div className="profile-summary p-6 sm:p-7 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div className="flex items-center gap-4 min-w-0">
-            {user.image ? (
-              <Image
-                src={user.image}
-                alt={user.name || "프로필"}
-                width={56}
-                height={56}
-                className="rounded-full border border-zinc-200 dark:border-zinc-700"
-              />
-            ) : (
-              <div className="w-14 h-14 rounded-full bg-blue-600 text-white font-bold text-xl flex items-center justify-center uppercase shadow-sm">
-                {user.name?.[0] || user.email?.[0] || "U"}
-              </div>
-            )}
+            <Avatar src={user.image} name={user.name} size={56} />
 
             <div>
               <div className="flex flex-wrap items-center gap-2">
@@ -119,6 +108,7 @@ export default async function MyPage({ searchParams }: { searchParams: Promise<{
           }}
           categories={user.categories}
           initialTab={tab}
+          likes={<LikedPosts userId={user.id} />}
           posts={data && <BlogExplorer key={`${selectedPost || "list"}:${selectedCategory || "all"}`} data={data} embedded initialPostId={selectedPost} initialCategory={selectedCategory || "all"} />}
         />
       </main>

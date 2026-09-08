@@ -209,7 +209,6 @@
 .composer-title::placeholder { color: var(--muted); opacity: .55; }
 .composer-byline { font-size: 11px; color: var(--muted); margin: 18px 0 34px; padding-bottom: 26px; border-bottom: 1px solid var(--line); }
 .composer-editor-wrap { position: relative; }.composer-body { min-height: 380px; outline: none; }.composer-body:focus-visible { outline: none; }
-.composer-placeholder { position: absolute; top: 0; left: 0; color: var(--muted); opacity: .7; pointer-events: none; font-size: 16px; line-height: 1.9; }
 .composer-bottom-bar { position: sticky; bottom: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 17px 40px; border-top: 1px solid var(--line); background: var(--header); backdrop-filter: blur(16px); }
 .composer-actions { display: flex; gap: 8px; flex-shrink: 0; }.composer-actions .button { min-height: 40px; font-size: 12px; padding: 9px 18px; }
 .composer-save-info { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 10px; color: var(--muted); }.save-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }.composer-word-count { border-left: 1px solid var(--line); padding-left: 12px; margin-left: 4px; }
@@ -263,3 +262,62 @@
 @media (max-width: 800px) { .blog-reading > article { padding-left: 0; } }
 @media (max-width: 600px) { .blog-sidebar { position: static; max-height: none; overflow: visible; padding: 0; }.blog-sidebar .article-toc { display: block; }.article-toc ol { max-height: 180px; overflow-y: auto; }.blog-reading > article { padding: 0 0 30px; }.settings-panel:has(.blog-explorer) { padding: 0; }.blog-post-item { padding-inline: 0; }.composer-outline-settings { padding: 12px 20px; gap: 10px; } }
 @media (max-width: 480px) { .article-heading, #post-start, #post-list { scroll-margin-top: 155px; } }
+
+/* Post rows remain a single readable click target. */
+.feed-post { position: relative; }
+.feed-post-link { display: block; }
+.feed-post-link::after { content: ""; position: absolute; inset: 0; }
+.feed-post .post-author a { position: relative; z-index: 1; }
+.feed-post:hover h3, .feed-post:focus-within h3, .blog-post-item:focus-visible h3, .popular-row:hover h3, .popular-row:focus-visible h3 { color: var(--accent); }
+.feed-post h3, .popular-row h3 { transition: color .15s ease; }
+.post-tags { display: flex; flex-wrap: wrap; gap: 6px 12px; margin-top: 14px; color: var(--accent); font-size: 12px; overflow-wrap: anywhere; }
+.post-tags:empty { display: none; }
+.article-tags { margin: -16px 0 32px; }
+.tag-editor { margin: 16px 0; }
+.tag-editor .post-tags { margin: 0 0 10px; }
+.tag-editor .post-tags button { border-radius: 5px; padding: 4px 8px; background: var(--subtle); }
+.tag-entry { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 12px; }
+.tag-entry input { max-width: 240px; min-width: 0; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background: transparent; padding: 8px 0; font-size: 14px; }
+.tag-entry button { color: var(--accent); white-space: nowrap; }
+.tag-editor > p { font-size: 12px; color: var(--accent); margin-top: 8px; }
+.composer-body p.is-editor-empty:first-child::before { content: attr(data-placeholder); float: left; color: var(--muted); opacity: .7; pointer-events: none; height: 0; }
+.composer-editor-wrap[inert] .is-editor-empty::before { content: none; }
+.rich-prose mark { padding: .04em .08em; border-radius: 2px; color: #202631; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.weekly-popular { margin-top: 44px; }
+.weekly-popular ol { list-style: none; margin: 0; padding: 0; }
+.popular-row { display: flex; align-items: center; gap: 20px; padding: 22px 0; border-bottom: 1px solid var(--line); }
+.popular-row > div { flex: 1; min-width: 0; }
+.popular-row h3 { font-size: 17px; line-height: 1.5; font-weight: 600; overflow-wrap: anywhere; }
+.popular-row small, .popular-views { color: var(--muted); font-size: 12px; }
+.popular-row small { display: block; margin-top: 6px; }
+.popular-rank { width: 24px; color: var(--accent); font-size: 23px; font-weight: 600; }
+.popular-views { white-space: nowrap; }
+.post-engagement { margin-top: 60px; padding-top: 28px; border-top: 1px solid var(--line); }
+.engagement-summary { display: flex; align-items: center; gap: 20px; margin-bottom: 42px; }
+.engagement-summary > span { font-size: 13px; color: var(--muted); }
+.like-button[aria-pressed="true"] { color: var(--accent); border-color: var(--accent); }
+.comments-heading { font-size: 19px; font-weight: 600; margin-bottom: 20px; }
+.comments-heading span { color: var(--muted); font-size: 14px; margin-left: 6px; }
+.comment-form { padding: 0 0 24px; }
+.comment-anonymous-toggle { display: flex; align-items: center; gap: 8px; font-size: 13px; margin-bottom: 14px; }
+.comment-anonymous-toggle input { width: 15px; height: 15px; accent-color: var(--accent); }
+.comment-credentials { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.comment-form input:not([type="checkbox"]), .comment-form textarea, .modal-form textarea { width: 100%; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 12px; color: var(--foreground); font: inherit; font-size: 14px; }
+.comment-form textarea, .modal-form textarea { resize: vertical; min-height: 110px; }
+.comment-hint { color: var(--muted); font-size: 12px; line-height: 1.7; margin: 12px 0; }
+.comment-form-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+.comment-form-footer small { color: var(--muted); font-size: 12px; }
+.comment-item { border-top: 1px solid var(--line); padding: 22px 0; }
+.comment-byline { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 13px; }
+.comment-byline strong { font-weight: 600; overflow-wrap: anywhere; }
+.comment-byline time, .comment-byline > span { font-size: 11px; color: var(--muted); }
+.comment-item > p { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; line-height: 1.8; margin: 14px 0; }
+.comment-actions { display: flex; gap: 14px; color: var(--muted); font-size: 12px; }
+.comment-actions button:hover, .text-link:hover { color: var(--accent); }
+.text-link { margin-left: 12px; text-decoration: underline; }
+@media (max-width: 600px) {
+  .comment-credentials { grid-template-columns: 1fr; }
+  .popular-row { gap: 12px; }
+  .composer-toolbar { flex-wrap: wrap; }
+  .toolbar-history { margin-left: 0; }
+}

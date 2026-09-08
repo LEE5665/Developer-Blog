@@ -1,3 +1,4 @@
+import { weeklyPopularPosts } from "@/lib/post-stats";
 import Link from "next/link";
 import { Avatar } from "./components/Avatar";
 import { auth } from "@/lib/auth";
@@ -63,6 +64,8 @@ export default async function HomePage() {
     orderBy: { createdAt: "desc" },
   });
 
+  const popularPosts = await weeklyPopularPosts();
+
   return (
     <main className="page-container">
       <section className="hero" aria-labelledby="home-title">
@@ -89,14 +92,16 @@ export default async function HomePage() {
             <div className="post-list">
               {posts.map((post) => (
                 <article key={post.id} className="feed-post">
+                  <Link href={`/posts/${post.id}#post-start`} className="feed-post-link">
                   <div className="post-meta">
                     {post.category && <span className="tag">{post.category.name}</span>}
                     <span className="inline-flex items-center gap-1"><Icon name={post.visibility === "PRIVATE" ? "lock" : post.visibility === "FRIENDS" ? "users" : "globe"} width={12} height={12} />{post.visibility === "PRIVATE" ? "나만 보기" : post.visibility === "FRIENDS" ? "친구 공개" : "전체 공개"}</span>
                     <time dateTime={post.createdAt.toISOString()}>{post.createdAt.toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "numeric" })}</time>
                   </div>
-                  <h3><Link href={`/posts/${post.id}#post-start`}>{post.title}</Link></h3>
+                  <h3>{post.title}</h3>
                   <p className="post-body line-clamp-3">{postExcerpt(post.content)}</p>
-                  <Link className="blog-read-more" href={`/posts/${post.id}#post-start`}>전체 글 읽기 <Icon name="arrow" width={14} height={14} /></Link>
+                  <div className="post-tags">{post.tags.map((tag) => <span key={tag}>#{tag}</span>)}</div>
+                  </Link>
                   <div className="post-author">
                     <Avatar src={post.author.image} name={post.author.name} size={32} />
                     <Link href={`/blog/${post.authorId}`}><strong>{post.author.name || "개발자"}</strong></Link>
@@ -114,6 +119,7 @@ export default async function HomePage() {
               <Link href={user ? "/write" : "/login"} className="button button-primary">첫 글 작성하기<Icon name="arrow" width={15} height={15} /></Link>
             </div>
           )}
+          <section className="weekly-popular" aria-labelledby="popular-title"><div className="section-heading"><h2 id="popular-title">이번 주 많이 읽은 글</h2><span>최근 7일 조회수순</span></div><ol>{popularPosts.map((post, index) => <li key={post.id}><Link href={`/posts/${post.id}#post-start`} className="popular-row"><span className="popular-rank">{index + 1}</span><div><h3>{post.title}</h3><small>{post.author.name || "개발자"}</small></div><span className="popular-views">조회 {post.weeklyViews}</span></Link></li>)}</ol>{!popularPosts.length && <p className="comment-hint">최근 7일 동안 읽힌 공개 글이 아직 없습니다.</p>}</section>
         </section>
         <aside className="feed-aside">
           <div className="aside-card"><span className="eyebrow">YOUR WORKSPACE</span><h3>{user ? (user.name || "개발자") + " 님의 기록 공간" : "기록이 습관이 되는 곳"}</h3><p>글을 모으고, 주제별로 정리하고,<br />앞으로의 계획을 세워보세요.</p><Link href={user ? "/mypage" : "/signup"} className="button button-secondary">{user ? "마이페이지" : "나만의 공간 만들기"}<Icon name="arrow" width={14} height={14} /></Link></div>
