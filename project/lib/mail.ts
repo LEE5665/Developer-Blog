@@ -13,13 +13,6 @@ export async function sendVerificationEmail(email: string, token: string) {
   const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
   const confirmLink = `${baseUrl}/verify-email?token=${token}`;
 
-  // 개발자 터미널 콘솔 로그 출력 (테스트용)
-  console.log("==========================================");
-  console.log(`[이메일 인증 링크 전송]`);
-  console.log(`수신자: ${email}`);
-  console.log(`인증 링크: ${confirmLink}`);
-  console.log("==========================================");
-
   // SMTP 환경변수가 설정되어 있다면 실제 Gmail로 메일 발송
   if (process.env.EMAIL_SERVER_USER && process.env.EMAIL_SERVER_PASSWORD) {
     try {

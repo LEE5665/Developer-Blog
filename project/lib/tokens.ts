@@ -2,7 +2,7 @@ import crypto from "crypto";
 import prisma from "@/lib/prisma";
 import { generateUniqueTag } from "@/lib/tag";
 
-interface SignupPayload {
+type SignupPayload = {
   name: string;
   email: string;
   nickname: string;
@@ -48,6 +48,18 @@ export async function createSignupVerificationToken(payload: SignupPayload) {
       expires,
     },
   });
+
+  // 토큰 발급 시 5% 확률로 만료된 토큰을 정리합니다.
+  if (Math.random() < 0.05) {
+    try {
+      await prisma.verificationToken.deleteMany({
+        where: { expires: { lt: new Date() } },
+      });
+    } catch (error) {
+      // 정리 실패가 정상적인 토큰 발급을 막지 않도록 합니다.
+      console.error("만료된 인증 토큰 정리 실패:", error);
+    }
+  }
 
   return verificationToken;
 }

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Avatar } from "@/app/components/Avatar";
-import { LikedPosts } from "@/app/components/LikedPosts";
+import { LikedPosts } from "./LikedPosts";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
