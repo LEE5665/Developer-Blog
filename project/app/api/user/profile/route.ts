@@ -27,6 +27,8 @@ export async function PATCH(req: Request) {
       );
     }
 
+    if (trimmedName.includes("#")) return NextResponse.json({ error: "이름에는 # 구분번호를 붙이지 말고 이름만 입력해주세요." }, { status: 400 });
+
     if (trimmedName.length < 2 || trimmedName.length > 30) {
       return NextResponse.json(
         { error: "이름은 2자 이상 30자 이하로 입력해주세요." },

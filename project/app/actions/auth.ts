@@ -29,6 +29,8 @@ export async function signUpAction(
     return { error: "필수 입력 항목을 모두 입력해주세요." };
   }
 
+  if (name.includes("#")) return { error: "이름에는 # 구분번호를 붙이지 말고 이름만 입력해주세요." };
+
   if (name.length < 2 || name.length > 30) {
     return { error: "이름은 2자 이상 30자 이하로 입력해주세요." };
   }

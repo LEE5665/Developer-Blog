@@ -1,3 +1,4 @@
+import { displayName } from "./display-name";
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
@@ -108,6 +109,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           }
         }
       }
+      token.name = displayName(token.name, token.tag);
       return token;
     },
 
