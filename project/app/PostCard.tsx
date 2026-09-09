@@ -6,12 +6,12 @@ export type PostCardData = {
   id: string; title: string; excerpt: string; thumbnail: string | null; tags: string[];
   visibility: "PUBLIC" | "PRIVATE" | "FRIENDS"; createdAt: string; authorId: string;
   author: { name: string | null; image: string | null; nickname: string | null; tag: string | null };
-  category: { name: string } | null; likes: number;
+  category: { name: string } | null; likes: number; liked?: boolean;
 };
 
-export function PostCard({ post, currentUserId, rank, views }: { post: PostCardData; currentUserId?: string; rank?: number; views?: number }) {
+export function PostCard({ post, currentUserId, rank, views, href }: { post: PostCardData; currentUserId?: string; rank?: number; views?: number; href?: string }) {
   return <article className="feed-post">
-    <Link href={`/posts/${post.id}#post-start`} className="feed-post-link">
+    <Link href={href || `/posts/${post.id}#post-start`} className="feed-post-link">
       {post.thumbnail && <div className="feed-post-thumbnail">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={post.thumbnail} alt="" loading="lazy" decoding="async" />
@@ -38,7 +38,7 @@ export function PostCard({ post, currentUserId, rank, views }: { post: PostCardD
       <span className="feed-post-stats">
         {currentUserId === post.authorId && <span>내 글</span>}
         {views !== undefined && <span>조회 {views.toLocaleString("ko-KR")}</span>}
-        <span aria-label={`좋아요 ${post.likes}개`}><Icon name="heart" width={14} height={14} />{post.likes.toLocaleString("ko-KR")}</span>
+        <span className={post.liked ? "post-liked" : undefined} aria-label={`좋아요 ${post.likes}개`}><Icon name="heart" width={14} height={14} fill={post.liked ? "currentColor" : "none"} />{post.likes.toLocaleString("ko-KR")}</span>
       </span>
     </div>
   </article>;

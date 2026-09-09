@@ -394,3 +394,8 @@
 @media (min-width: 701px) and (max-width: 1050px) { .home-post-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 700px) { .home-post-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 480px) { .home-post-grid { grid-template-columns: minmax(0, 1fr); } }
+
+.feed-author-details a { border-radius: 4px; transition: color .15s ease; }
+.feed-author-details a:hover, .feed-author-details a:focus-visible { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+.feed-author-details a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.post-liked { color: var(--accent); }

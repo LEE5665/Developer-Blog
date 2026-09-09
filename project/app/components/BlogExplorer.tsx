@@ -3,13 +3,14 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { PostCard } from "../PostCard";
 import { PostEngagement } from "./PostEngagement";
 import { PostContent } from "./PostContent";
 import { Avatar } from "./Avatar";
 import { ArticleToc } from "./ArticleToc";
 import { Icon } from "./Icon";
 import { Modal } from "./Modal";
-import { documentOutline, readDocument, postExcerpt } from "@/lib/post-content";
+import { documentOutline, readDocument, postExcerpt, imageSources } from "@/lib/post-content";
 import type { blogData } from "@/lib/blog-data";
 
 type Data = NonNullable<Awaited<ReturnType<typeof blogData>>>;
@@ -62,7 +63,10 @@ export function BlogExplorer({ data, initialPostId, initialCategory = "all", emb
       </article> : <>
         <div className="section-heading"><h2 id="post-list" tabIndex={-1}>{categoryName}</h2><span>{filtered.length}개의 글</span></div>
         {data.isOwner && category === "all" && data.drafts.length > 0 && <div className="blog-drafts"><h3>이어서 작성하기</h3>{data.drafts.map((draft) => <Link key={draft.id} href={draft.key === "new" ? "/write" : `/posts/${draft.key}/edit`}><span>{draft.title || "제목 없는 임시 글"}</span><small>{draft.key === "new" ? "임시저장" : "수정 중"}</small></Link>)}</div>}
-        {filtered.length ? <div className="blog-post-list">{filtered.map((item) => <Link href={embedded ? `${listUrl}&post=${item.id}#post-start` : `/posts/${item.id}#post-start`} key={item.id} className="blog-post-item"><div className="blog-post-meta"><span>{data.categories.find((cat) => cat.id === item.categoryId)?.name || "미분류"}</span><time dateTime={item.createdAt}>{new Date(item.createdAt).toLocaleDateString("ko-KR")}</time>{item.visibility !== "PUBLIC" && <span>{item.visibility === "PRIVATE" ? "나만 보기" : "친구 공개"}</span>}</div><h3>{item.title}</h3><p className="line-clamp-2">{postExcerpt(item.content)}</p><div className="post-tags">{item.tags.map((tag) => <span key={tag}>#{tag}</span>)}</div></Link>)}</div> : <div className="empty-state"><div className="empty-icon"><Icon name="file" /></div><h3>아직 글이 없습니다</h3><p>{data.isOwner ? "이 카테고리에 첫 번째 이야기를 남겨보세요." : "공개된 글이 아직 없습니다."}</p></div>}
+        {filtered.length ? <div className="home-post-grid">{filtered.map((item) => {
+          const doc = readDocument(item.content);
+          return <PostCard key={item.id} currentUserId={data.viewerId} views={item._count.views} href={embedded ? `${listUrl}&post=${item.id}#post-start` : `/posts/${item.id}#post-start`} post={{ ...item, authorId: data.author.id, author: data.author, category: data.categories.find((cat) => cat.id === item.categoryId) || null, excerpt: postExcerpt(item.content), thumbnail: doc ? imageSources(doc)[0] || null : null, likes: item._count.likes, liked: item.likes.length > 0 }} />;
+        })}</div> : <div className="empty-state"><div className="empty-icon"><Icon name="file" /></div><h3>아직 글이 없습니다</h3><p>{data.isOwner ? "이 카테고리에 첫 번째 이야기를 남겨보세요." : "공개된 글이 아직 없습니다."}</p></div>}
       </>}
     </section>
     <Modal open={deleteOpen} onClose={() => { if (!deleting) setDeleteOpen(false); }} title="글 삭제"><div className="modal-form"><p>이 글을 삭제할까요? 수정 중인 임시 글도 삭제됩니다. 다른 글이나 임시저장에서 사용 중인 이미지는 유지됩니다.</p>{error && <p role="alert" className="composer-error">{error}</p>}<div className="modal-actions"><button type="button" className="button button-secondary" disabled={deleting} onClick={() => setDeleteOpen(false)}>취소</button><button type="button" className="button button-primary" disabled={deleting} onClick={deletePost}>{deleting ? "삭제 중..." : "삭제하기"}</button></div></div></Modal>

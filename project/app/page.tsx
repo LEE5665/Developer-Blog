@@ -54,6 +54,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
     where, take: 9, skip: (currentPage - 1) * 9,
     include: {
       _count: { select: { likes: true, views: true } },
+      likes: { where: { userId: currentUserId ?? "" }, select: { userId: true } },
       author: {
         select: {
           id: true,
@@ -73,7 +74,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
     orderBy: [{ createdAt: "desc" }, { id: "desc" }],
   });
 
-  const rankings = await popularRankings();
+  const rankings = await popularRankings(currentUserId);
 
   return (
     <main className="page-container">
@@ -100,7 +101,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
                 const images = doc ? imageSources(doc) : [];
                 const thumbnail = images.length > 0 ? images[0] : null;
                 return (
-                  <PostCard key={post.id} currentUserId={currentUserId} views={post._count.views} post={{ ...post, createdAt: post.createdAt.toISOString(), excerpt: postExcerpt(post.content).slice(0, 300), thumbnail, likes: post._count.likes }} />
+                  <PostCard key={post.id} currentUserId={currentUserId} views={post._count.views} post={{ ...post, createdAt: post.createdAt.toISOString(), excerpt: postExcerpt(post.content).slice(0, 300), thumbnail, likes: post._count.likes, liked: post.likes.length > 0 }} />
                 );
               })}
             </div>
