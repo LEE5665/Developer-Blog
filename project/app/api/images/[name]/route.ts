@@ -5,7 +5,7 @@ import { imageSources, readDocument } from "@/lib/post-content";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-const headers = { "Cache-Control": "private, no-store", "X-Content-Type-Options": "nosniff" };
+const headers = { "Cache-Control": "private, max-age=300, stale-while-revalidate=60", "X-Content-Type-Options": "nosniff" };
 
 export async function GET(_request: Request, { params }: { params: Promise<{ name: string }> }) {
   const { name } = await params;
