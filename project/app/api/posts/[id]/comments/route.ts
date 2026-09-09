@@ -1,3 +1,4 @@
+import { publishUserEvents } from "@/lib/realtime";
 import bcrypt from "bcryptjs";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
@@ -8,7 +9,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     checkMutation(request);
     const { id } = await params;
     const userId = (await auth())?.user?.id;
-    await readablePost(id, userId);
+    const post = await readablePost(id, userId);
     const body = await request.json();
     const anonymous = !userId;
     const content = commentContent(body.content);
@@ -24,7 +25,10 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       if (!user) throw new PostError("다시 로그인해주세요.", 401);
       nickname = user.nickname || user.name || "개발자";
     }
-    const comment = await prisma.comment.create({ data: { postId: id, authorId: anonymous ? null : userId, anonymous, nickname, passwordHash, content }, select: { id: true } });
+    const comment = await prisma.comment.create({ data: { postId: id, authorId: anonymous ? null : userId, anonymous, nickname, passwordHash, content,
+      ...(post.authorId !== userId ? { notification: { create: { recipientId: post.authorId } } } : {}),
+    }, select: { id: true } });
+    if (post.authorId !== userId) await publishUserEvents([post.authorId], { type: "notifications" });
     return Response.json({ comment }, { status: 201 });
   } catch (error) { return postFailure(error); }
 }

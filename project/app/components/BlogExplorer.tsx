@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { FriendButton } from "./FriendButton";
 import { PostCard } from "../PostCard";
 import { PostEngagement } from "./PostEngagement";
 import { PostContent } from "./PostContent";
@@ -46,7 +47,8 @@ export function BlogExplorer({ data, initialPostId, initialCategory = "all", emb
   }
   return <div className="blog-explorer">
     <aside className="blog-sidebar">
-      <Link href={blogUrl} className="blog-owner"><Avatar src={data.author.image} name={data.author.name} size={64} /><strong>{data.author.name || "개발자"}</strong><small>{data.author.nickname ? `${data.author.nickname}#${data.author.tag}` : "Developer Blog"}</small></Link>
+      <Link href={blogUrl} className="blog-owner"><Avatar src={data.author.image} name={data.author.name} size={64} /><strong>{data.author.name || "개발자"}</strong>{data.author.bio && <p className="blog-owner-bio">{data.author.bio}</p>}<small>{data.author.nickname ? `${data.author.nickname}#${data.author.tag}` : "Developer Blog"}</small></Link>
+      <FriendButton authorId={data.author.id} viewerId={data.viewerId} friendship={data.friendship} />
       <nav aria-label="작성자 카테고리"><span className="blog-sidebar-label">CATEGORIES</span>{categoryLink("all", "전체 글", data.posts.length)}{data.categories.map((item) => item.isDivider ? <hr key={item.id} /> : <div key={item.id}>{categoryLink(item.id, item.name, data.posts.filter((post) => post.categoryId === item.id).length)}</div>)}{categoryLink("uncategorized", "미분류", data.posts.filter((post) => post.categoryId === null).length)}</nav>
       <ArticleToc items={outline} />
       {data.isOwner && <Link href="/write" className="button button-accent w-full mt-6"><Icon name="pen" width={16} height={16} />새 글 작성</Link>}

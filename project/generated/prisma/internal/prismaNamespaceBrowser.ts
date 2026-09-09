@@ -59,6 +59,9 @@ export const ModelName = {
   PostDraft: 'PostDraft',
   PostLike: 'PostLike',
   Comment: 'Comment',
+  Notification: 'Notification',
+  Conversation: 'Conversation',
+  Message: 'Message',
   PostView: 'PostView',
   ActionLimit: 'ActionLimit',
   ImageAsset: 'ImageAsset',
@@ -88,6 +91,7 @@ export const UserScalarFieldEnum = {
   id: 'id',
   name: 'name',
   nickname: 'nickname',
+  bio: 'bio',
   tag: 'tag',
   email: 'email',
   emailVerified: 'emailVerified',
@@ -195,6 +199,41 @@ export const CommentScalarFieldEnum = {
 } as const
 
 export type CommentScalarFieldEnum = (typeof CommentScalarFieldEnum)[keyof typeof CommentScalarFieldEnum]
+
+
+export const NotificationScalarFieldEnum = {
+  id: 'id',
+  recipientId: 'recipientId',
+  commentId: 'commentId',
+  createdAt: 'createdAt'
+} as const
+
+export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
+
+
+export const ConversationScalarFieldEnum = {
+  id: 'id',
+  userAId: 'userAId',
+  userBId: 'userBId',
+  readA: 'readA',
+  readB: 'readB',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ConversationScalarFieldEnum = (typeof ConversationScalarFieldEnum)[keyof typeof ConversationScalarFieldEnum]
+
+
+export const MessageScalarFieldEnum = {
+  id: 'id',
+  conversationId: 'conversationId',
+  senderId: 'senderId',
+  clientId: 'clientId',
+  content: 'content',
+  createdAt: 'createdAt'
+} as const
+
+export type MessageScalarFieldEnum = (typeof MessageScalarFieldEnum)[keyof typeof MessageScalarFieldEnum]
 
 
 export const PostViewScalarFieldEnum = {

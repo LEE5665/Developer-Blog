@@ -1,4 +1,35 @@
 services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "127.0.0.1:6379:6379"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  app:
+    profiles: ["app"]
+    build: ./project
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    env_file: ./project/.env
+    environment:
+      DATABASE_URL: postgresql://user:userpass@postgres:5432/developer_blog
+      REDIS_URL: redis://redis:6379
+      AUTH_TRUST_HOST: "true"
+      UPLOAD_DIR: /app/storage/uploads
+    depends_on:
+      postgres:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    volumes:
+      - uploads:/app/storage/uploads
+    restart: unless-stopped
+
   postgres:
     image: postgres:17
     ports:
@@ -14,3 +45,4 @@ services:
 
 volumes:
   postgres_data:
+  uploads:

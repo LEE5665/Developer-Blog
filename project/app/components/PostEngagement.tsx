@@ -75,7 +75,7 @@ export function PostEngagement({ postId }: { postId: string }) {
     finally { setBusy(false); }
   }
   const isAnonymous = !data?.loggedIn;
-  return <section className="post-engagement" aria-label="좋아요와 댓글">
+  return <section id="comments" className="post-engagement" aria-label="좋아요와 댓글">
     <div className="engagement-summary">{data?.loggedIn ? <button type="button" className="button button-secondary like-button" aria-pressed={data.liked} disabled={busy} onClick={like}><Heart filled={data.liked} />좋아요 {data.likes}</button> : <Link href="/login" className="button button-secondary" aria-label="로그인하고 좋아요"><Heart filled={false} />좋아요 {data?.likes || 0}</Link>}<span>조회 {data?.views ?? "—"}</span></div>
     <h2 className="comments-heading">댓글 <span>{data?.totalComments ?? 0}</span></h2>
     {data && <form className="comment-form" onSubmit={submit}>

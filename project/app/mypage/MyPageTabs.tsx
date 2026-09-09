@@ -5,6 +5,7 @@ import { Icon, type IconName } from "@/app/components/Icon";
 import { ProfileEditor } from "./ProfileEditor";
 import { CategoryManager, CategoryItem } from "./CategoryManager";
 import { TodoCalendar } from "./TodoCalendar";
+import { FriendManager, type FriendProfile } from "./FriendManager";
 
 interface MyPageTabsProps {
   user: {
@@ -14,21 +15,24 @@ interface MyPageTabsProps {
     tag: string | null;
     email: string | null;
     image: string | null;
+    bio: string | null;
   };
   categories: CategoryItem[];
   posts: ReactNode;
   likes: ReactNode;
+  friends: FriendProfile[];
   initialTab?: string;
 }
 
-type TabType = "profile" | "posts" | "likes" | "category" | "todo";
+type TabType = "profile" | "posts" | "friends" | "likes" | "category" | "todo";
 
-export function MyPageTabs({ user, categories, posts, likes, initialTab }: MyPageTabsProps) {
-  const [activeTab, setActiveTab] = useState<TabType>(initialTab === "likes" ? "likes" : initialTab === "posts" ? "posts" : "profile");
+export function MyPageTabs({ user, categories, posts, likes, friends, initialTab }: MyPageTabsProps) {
+  const [activeTab, setActiveTab] = useState<TabType>(initialTab === "friends" ? "friends" : initialTab === "likes" ? "likes" : initialTab === "posts" ? "posts" : "profile");
 
   const tabs: { id: TabType; label: string; icon: IconName; badge?: string }[] = [
     { id: "profile", label: "프로필 설정", icon: "user" },
     { id: "posts", label: "내 포스트", icon: "file" },
+    { id: "friends", label: "친구관리", icon: "users", badge: String(friends.length) },
     { id: "likes", label: "내가 좋아요 한 글", icon: "bookmark" },
     { id: "category", label: "카테고리", icon: "folder", badge: String(categories.filter((category) => !category.isDivider).length) },
     { id: "todo", label: "캘린더", icon: "calendar" },
@@ -47,6 +51,7 @@ export function MyPageTabs({ user, categories, posts, likes, initialTab }: MyPag
       <div id="settings-panel" className="settings-panel">
         {activeTab === "profile" && <ProfileEditor user={user} />}
         {activeTab === "posts" && posts}
+        {activeTab === "friends" && <FriendManager friends={friends} />}
         {activeTab === "likes" && likes}
         {activeTab === "category" && <CategoryManager categories={categories} />}
         {activeTab === "todo" && <TodoCalendar />}

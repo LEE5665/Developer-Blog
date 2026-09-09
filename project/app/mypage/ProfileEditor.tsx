@@ -12,6 +12,7 @@ interface UserProfile {
   tag: string | null;
   email: string | null;
   image: string | null;
+  bio: string | null;
 }
 
 export function ProfileEditor({ user }: { user: UserProfile }) {
@@ -20,6 +21,7 @@ export function ProfileEditor({ user }: { user: UserProfile }) {
   // 기본 프로필 상태
   const [name, setName] = useState(user.name || "");
   const [nickname, setNickname] = useState(user.nickname || "");
+  const [bio, setBio] = useState(user.bio || "");
   const [currentTag, setCurrentTag] = useState(user.tag || "0001");
   const [profileLoading, setProfileLoading] = useState(false);
   const [profileStatus, setProfileStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
@@ -63,6 +65,7 @@ export function ProfileEditor({ user }: { user: UserProfile }) {
         body: JSON.stringify({
           name: trimmedName,
           nickname: trimmedNickname,
+          bio,
         }),
       });
 
@@ -230,6 +233,21 @@ export function ProfileEditor({ user }: { user: UserProfile }) {
                 닉네임 변경 시 새로운 4자리 고유 태그가 자동 발급됩니다.
               </p>
             </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <label htmlFor="profile-bio" className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">자기소개</label>
+            <textarea
+              id="profile-bio"
+              value={bio}
+              onChange={(event) => setBio(event.target.value)}
+              maxLength={300}
+              rows={4}
+              aria-describedby="profile-bio-hint"
+              placeholder="관심 분야나 나에 대한 소개를 적어주세요."
+              className="w-full px-4 py-2.5 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white text-sm focus:outline-hidden focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition"
+            />
+            <p id="profile-bio-hint" className="text-[11px] text-zinc-400">블로그와 글의 왼쪽 사이드바에 공개됩니다. {bio.length}/300</p>
           </div>
 
           {/* 이메일 (읽기 전용) */}

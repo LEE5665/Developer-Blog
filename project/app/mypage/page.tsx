@@ -44,6 +44,13 @@ export default async function MyPage({ searchParams }: { searchParams: Promise<{
     (user._count?.sentFriendRequests ?? 0) +
     (user._count?.receivedFriendRequests ?? 0);
   const data = await blogData(user.id, user.id);
+  const profileSelect = { id: true, name: true, nickname: true, tag: true, image: true, bio: true } as const;
+  const friendships = await prisma.friendship.findMany({
+    where: { status: "ACCEPTED", OR: [{ userId: user.id }, { friendId: user.id }] },
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+    select: { userId: true, user: { select: profileSelect }, friend: { select: profileSelect } },
+  });
+  const friends = friendships.map((friendship) => friendship.userId === user.id ? friendship.friend : friendship.user);
   const { tab, post: selectedPost, category: selectedCategory } = await searchParams;
 
   return (
@@ -105,8 +112,10 @@ export default async function MyPage({ searchParams }: { searchParams: Promise<{
             tag: user.tag,
             email: user.email,
             image: user.image,
+            bio: user.bio,
           }}
           categories={user.categories}
+          friends={friends}
           initialTab={tab}
           likes={<LikedPosts userId={user.id} />}
           posts={data && <BlogExplorer key={`${selectedPost || "list"}:${selectedCategory || "all"}`} data={data} embedded initialPostId={selectedPost} initialCategory={selectedCategory || "all"} />}

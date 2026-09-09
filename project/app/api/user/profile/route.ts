@@ -15,7 +15,11 @@ export async function PATCH(req: Request) {
     }
 
     const body = await req.json();
-    const { name, nickname } = body;
+    const { name, nickname, bio } = body;
+
+    if (bio !== undefined && (typeof bio !== "string" || bio.length > 300)) {
+      return NextResponse.json({ error: "자기소개는 300자 이하의 텍스트로 입력해주세요." }, { status: 400 });
+    }
 
     const trimmedName = name?.trim();
     const trimmedNickname = nickname?.trim();
@@ -65,6 +69,7 @@ export async function PATCH(req: Request) {
       data: {
         name: trimmedName,
         nickname: trimmedNickname,
+        ...(bio !== undefined ? { bio: bio.trim() || null } : {}),
         tag: newTag,
       },
     });
@@ -76,6 +81,7 @@ export async function PATCH(req: Request) {
         id: updatedUser.id,
         name: updatedUser.name,
         nickname: updatedUser.nickname,
+        bio: updatedUser.bio,
         tag: updatedUser.tag,
         email: updatedUser.email,
       },

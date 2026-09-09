@@ -60,6 +60,41 @@ test('post, draft, permission, category and image lifecycle', { timeout: 120000 
       const response=await fetch(base+url,{method,headers:{...(session?{cookie:session}:{}),...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined});
       return {status:response.status,body:await response.json().catch(()=>null)};
     };
+    // Requests are private, directional, idempotent, and require recipient action.
+    assert.equal((await call('/api/notifications','GET',undefined,null)).status,401);
+    assert.equal((await call('/api/friends/'+owner,'POST',{},null)).status,401);
+    assert.equal((await call('/api/friends/'+owner,'POST',{})).status,400);
+    const sent = await call('/api/friends/'+owner,'POST',{},otherCookie);
+    assert.equal(sent.status,200,JSON.stringify(sent));
+    const requestId = sent.body.friendship.id;
+    const crossed = await Promise.all([
+      call('/api/friends/'+owner,'POST',{},otherCookie),
+      call('/api/friends/'+other,'POST',{},ownerCookie),
+    ]);
+    for (const result of crossed) assert.equal(result.body.friendship.id,requestId);
+    assert.equal((await call('/api/notifications')).body.requests.length,1);
+    assert.equal((await call('/api/notifications','GET',undefined,otherCookie)).body.requests.length,0);
+    assert.equal((await call('/api/friend-requests/'+requestId,'PATCH',{action:'accept'},otherCookie)).status,404);
+    await call('/api/notifications','DELETE',{all:true});
+    await call('/api/notifications','DELETE',{id:requestId});
+    assert.equal((await call('/api/notifications')).body.requests.length,1,'deletion preserves requests');
+    assert.equal((await call('/api/friend-requests/'+requestId,'PATCH',{action:'reject'})).status,200);
+    assert.equal((await call('/api/notifications')).body.requests.length,0);
+    const nextRequest = await call('/api/friends/'+owner,'POST',{},otherCookie);
+    assert.equal((await call('/api/friend-requests/'+nextRequest.body.friendship.id,'PATCH',{action:'accept'})).status,200);
+    assert.equal((await call('/api/friends/'+owner,'POST',{},otherCookie)).body.friendship.status,'ACCEPTED');
+    const friendPage = await (await fetch(base+'/mypage?tab=friends',{headers:{cookie:ownerCookie}})).text();
+    assert.ok(friendPage.includes('LifecycleOther'),'friend management lists accepted friends');
+    assert.equal((await call('/api/friends/'+owner,'DELETE',{},null)).status,401);
+    await call('/api/friends/'+other,'DELETE',{},friendCookie);
+    assert.equal((await db.query('SELECT id FROM "Friendship" WHERE id=$1',[nextRequest.body.friendship.id])).rowCount,1,'third party cannot remove a relationship');
+    assert.equal((await call('/api/friends/'+other,'DELETE',{})).status,200);
+    assert.equal((await db.query('SELECT id FROM "Friendship" WHERE id=$1',[nextRequest.body.friendship.id])).rowCount,0,'recipient can remove an accepted friendship');
+    const pendingAgain = await call('/api/friends/'+owner,'POST',{},otherCookie);
+    await call('/api/friends/'+other,'DELETE',{});
+    assert.equal((await call('/api/notifications')).body.requests.length,1,'friend removal leaves pending requests untouched');
+    await call('/api/friend-requests/'+pendingAgain.body.friendship.id,'PATCH',{action:'reject'});
+
     const bytes=await sharp({create:{width:32,height:24,channels:3,background:'#446699'}}).png().toBuffer();
     const upload=async()=>{ const form=new FormData();form.append('file',new File([bytes],'test.png',{type:'image/png'}));const r=await fetch(base+'/api/images',{method:'POST',headers:{cookie:ownerCookie},body:form});assert.equal(r.status,201,await r.clone().text());return (await r.json()).url; };
     const image=await upload();
@@ -151,6 +186,17 @@ test('post, draft, permission, category and image lifecycle', { timeout: 120000 
     let created=await call(engagementUrl+'/comments','POST',{content:'<script>not executable</script>',anonymous:true,nickname:'익명 독자',password:'comment-secret',authorId:owner},null);
     assert.equal(created.status,201,JSON.stringify(created));
     const anonId=created.body.comment.id;
+    let inbox = (await call('/api/notifications')).body;
+    assert.equal(inbox.comments.length,1,'anonymous comments notify the post owner');
+    assert.equal(inbox.comments[0].comment.id,anonId);
+    assert.ok(!JSON.stringify(inbox).includes('passwordHash'));
+    const noticeId = inbox.comments[0].id;
+    assert.equal((await call('/api/notifications','GET',undefined,otherCookie)).body.comments.length,0);
+    await call('/api/notifications','DELETE',{id:noticeId},otherCookie);
+    assert.equal((await call('/api/notifications')).body.comments.length,1,'another user cannot delete notifications');
+    await call('/api/notifications','DELETE',{id:noticeId});
+    assert.equal((await call('/api/notifications')).body.comments.length,0);
+
     const storedComment=(await db.query('SELECT * FROM "Comment" WHERE id=$1',[anonId])).rows[0];
     assert.equal(storedComment.authorId,null,'guest comment has no account link');
     assert.notEqual(storedComment.passwordHash,'comment-secret');
@@ -165,6 +211,16 @@ test('post, draft, permission, category and image lifecycle', { timeout: 120000 
     assert.equal((await call(engagementUrl+'/comments/'+anonId,'DELETE',{password:'comment-secret'},null)).status,200);
     created=await call(engagementUrl+'/comments','POST',{content:'Account comment',anonymous:true,nickname:'Spoofed nickname',authorId:other},ownerCookie);
     assert.equal(created.status,201); const memberId=created.body.comment.id;
+    assert.equal((await call('/api/notifications')).body.comments.length,0,'own comments do not notify');
+    const readerComment = await call(engagementUrl+'/comments','POST',{content:'Reader notification'},otherCookie);
+    assert.equal(readerComment.status,201);
+    inbox = (await call('/api/notifications')).body;
+    assert.equal(inbox.comments.length,1,'account comments notify the owner');
+    await call('/api/notifications','DELETE',{all:true});
+    assert.equal((await call('/api/notifications')).body.comments.length,0);
+    assert.equal((await db.query('SELECT id FROM "Comment" WHERE id=$1',[readerComment.body.comment.id])).rowCount,1,'notification deletion preserves comment');
+    await call(engagementUrl+'/comments/'+readerComment.body.comment.id,'DELETE',{},otherCookie);
+
     stats=(await call(engagementUrl+'/engagement','GET',undefined,null)).body;
     const member=stats.comments.find(item=>item.id===memberId);
     assert.equal(member.authorId,owner); assert.equal(member.anonymous,false,'signed-in users cannot request anonymous authorship'); assert.equal(member.image,'https://example.com/lifecycle-avatar.png'); assert.notEqual(member.nickname,'Spoofed nickname');
@@ -174,6 +230,7 @@ test('post, draft, permission, category and image lifecycle', { timeout: 120000 
     created=await call(engagementUrl+'/comments','POST',{content:'Moderation test',nickname:'Guest',password:'secret'},null);
     assert.equal(created.status,201);
     assert.equal((await call(engagementUrl+'/comments/'+created.body.comment.id,'DELETE',{},ownerCookie)).status,200,'post owner can moderate anonymous comments');
+    assert.equal((await call('/api/notifications')).body.comments.length,0,'deleted comments remove their notifications');
     assert.equal((await call(engagementUrl+'/comments','POST',{content:'x'.repeat(2001),nickname:'Guest',password:'secret'},null)).status,400);
     assert.equal((await call(engagementUrl+'/comments','POST',{content:'hello',nickname:'Guest',password:'짧'.repeat(25)},null)).status,400,'bcrypt byte length is bounded');
     for(let i=0;i<33;i++) await db.query('INSERT INTO "Comment" (id,"postId","authorId",nickname,content,"updatedAt") VALUES ($1,$2,$3,$4,$5,NOW())',[randomUUID(),post.id,owner,'Member','Pagination '+i]);
@@ -182,6 +239,9 @@ test('post, draft, permission, category and image lifecycle', { timeout: 120000 
     const more=(await call(engagementUrl+'/engagement?cursor='+stats.nextCursor,'GET',undefined,null)).body;
     assert.equal(more.comments.length,4); assert.equal(more.nextCursor,null);
     assert.ok(!more.comments.some(item=>stats.comments.some(previous=>previous.id===item.id)));
+    const chronologicalComments = (await db.query('SELECT id FROM "Comment" WHERE "postId"=$1 ORDER BY "createdAt" ASC, id ASC',[post.id])).rows.map(item=>item.id);
+    assert.deepEqual([...stats.comments,...more.comments].map(item=>item.id),chronologicalComments,'comments stay oldest-first across page boundaries');
+
 
     assert.equal((await call(engagementUrl+'/views','POST',{},ownerCookie)).body.views,0,'author views excluded');
     assert.equal((await call(engagementUrl+'/views','POST',{},otherCookie)).body.views,1);

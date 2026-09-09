@@ -1,3 +1,4 @@
+import { publishUserEvents } from "@/lib/realtime";
 import bcrypt from "bcryptjs";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
@@ -21,6 +22,7 @@ async function change(request: Request, params: Promise<{ id: string; commentId:
     }
     if (remove) await prisma.comment.delete({ where: { id: commentId } });
     else await prisma.comment.update({ where: { id: commentId }, data: { content: commentContent(body.content) } });
+    await publishUserEvents([post.authorId], { type: "notifications" });
     return Response.json({ success: true });
   } catch (error) { return postFailure(error); }
 }

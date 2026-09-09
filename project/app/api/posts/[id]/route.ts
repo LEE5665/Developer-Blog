@@ -1,3 +1,4 @@
+import { publishUserEvents } from "@/lib/realtime";
 ﻿import { auth } from "@/lib/auth";
 import { PostError, consumeDraft, mediaTransaction, postFailure, refreshOrphans, setPostImages, validatePost } from "@/lib/post-service";
 
@@ -34,6 +35,7 @@ export async function DELETE(_request: Request, { params }: Context) {
       await tx.post.delete({ where: { id } });
       await refreshOrphans(tx);
     });
+    await publishUserEvents([session.user.id], { type: "notifications" });
     return Response.json({ success: true });
   } catch (error) { return postFailure(error); }
 }

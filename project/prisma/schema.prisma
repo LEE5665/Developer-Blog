@@ -16,6 +16,7 @@ model User {
   id            String    @id @default(uuid())
   name          String?
   nickname      String?
+  bio           String?   @db.VarChar(300)
   tag           String?
   email         String?   @unique
   emailVerified DateTime? @db.Timestamptz(6)
@@ -34,6 +35,10 @@ model User {
   todos                  Todo[]
   sentFriendRequests     Friendship[] @relation("SentFriends")
   receivedFriendRequests Friendship[] @relation("ReceivedFriends")
+  notifications          Notification[]
+  conversationsA         Conversation[] @relation("ConversationA")
+  conversationsB         Conversation[] @relation("ConversationB")
+  messages               Message[]
 
   @@unique([nickname, tag])
 }
@@ -151,8 +156,49 @@ model Comment {
   content      String   @db.Text
   createdAt    DateTime @default(now()) @db.Timestamptz(6)
   updatedAt    DateTime @updatedAt @db.Timestamptz(6)
+  notification Notification?
   @@index([postId, createdAt, id])
   @@index([authorId])
+}
+
+model Notification {
+  id          String   @id @default(uuid())
+  recipientId String
+  recipient   User     @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  commentId   String   @unique
+  comment     Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([recipientId, createdAt])
+}
+
+model Conversation {
+  id        String @id @default(uuid())
+  userAId   String
+  userBId   String
+  userA     User @relation("ConversationA", fields: [userAId], references: [id], onDelete: Cascade)
+  userB     User @relation("ConversationB", fields: [userBId], references: [id], onDelete: Cascade)
+  readA     Int @default(0)
+  readB     Int @default(0)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @db.Timestamptz(6)
+  messages  Message[]
+  @@unique([userAId, userBId])
+  @@index([userBId, updatedAt])
+  @@index([userAId, updatedAt])
+}
+
+model Message {
+  id             Int @id @default(autoincrement())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId       String
+  sender         User @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  clientId       String
+  content        String @db.VarChar(2000)
+  createdAt      DateTime @default(now()) @db.Timestamptz(6)
+  @@unique([senderId, clientId])
+  @@index([conversationId, id])
 }
 
 model PostView {
