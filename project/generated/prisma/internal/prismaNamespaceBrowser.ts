@@ -195,7 +195,8 @@ export const CommentScalarFieldEnum = {
   passwordHash: 'passwordHash',
   content: 'content',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  parentId: 'parentId'
 } as const
 
 export type CommentScalarFieldEnum = (typeof CommentScalarFieldEnum)[keyof typeof CommentScalarFieldEnum]

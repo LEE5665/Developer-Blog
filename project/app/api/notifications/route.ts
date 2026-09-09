@@ -10,7 +10,7 @@ export async function GET() {
     if (!userId) throw new PostError("로그인이 필요합니다.", 401);
     const [requests, comments] = await Promise.all([
       prisma.friendship.findMany({ where: { friendId: userId, status: "PENDING" }, orderBy: [{ createdAt: "desc" }, { id: "desc" }], select: { id: true, createdAt: true, user: { select: { id: true, name: true, nickname: true, image: true } } } }),
-      prisma.notification.findMany({ where: { recipientId: userId }, orderBy: [{ createdAt: "desc" }, { id: "desc" }], select: { id: true, createdAt: true, comment: { select: { id: true, nickname: true, content: true, post: { select: { id: true, title: true } } } } } }),
+      prisma.notification.findMany({ where: { recipientId: userId }, orderBy: [{ createdAt: "desc" }, { id: "desc" }], select: { id: true, createdAt: true, comment: { select: { id: true, parentId: true, nickname: true, content: true, post: { select: { id: true, title: true } } } } } }),
     ]);
     return Response.json({ requests, comments }, { headers: { "Cache-Control": "private, no-store" } });
   } catch (error) { return postFailure(error); }

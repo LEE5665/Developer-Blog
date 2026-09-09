@@ -7,7 +7,7 @@ import { Avatar } from "./Avatar";
 
 type Inbox = {
   requests: { id: string; createdAt: string; user: { id: string; name: string | null; nickname: string | null; image: string | null } }[];
-  comments: { id: string; createdAt: string; comment: { id: string; nickname: string; content: string; post: { id: string; title: string } } }[];
+  comments: { id: string; createdAt: string; comment: { id: string; parentId: string | null; nickname: string; content: string; post: { id: string; title: string } } }[];
 };
 export function Notifications() {
   const router = useRouter();
@@ -97,10 +97,10 @@ export function Notifications() {
           <div className="notification-heading"><h3>댓글 알림</h3><button type="button" className="text-link" disabled={busy || !data?.comments.length} onClick={() => void mutate("/api/notifications", "DELETE", { all: true })}>전체 삭제</button></div>
           {data?.comments.map((notification) => <article key={notification.id} className="notification-item">
             <Link href={`/posts/${notification.comment.post.id}#comments`} onClick={() => setOpen(false)}>
-              <p><strong>{notification.comment.nickname}</strong>님이 댓글을 남겼습니다.</p>
-              <p className="notification-post-title">{notification.comment.post.title}</p>
-              <p className="line-clamp-2">{notification.comment.content}</p>
+              <p><strong>{notification.comment.nickname}</strong>님이 {notification.comment.parentId ? "답글" : "댓글"}을 남겼습니다.</p>
             </Link>
+            <p className="notification-post-title">{notification.comment.post.title}</p>
+            <p className="line-clamp-2">{notification.comment.content}</p>
             <div className="notification-actions"><time dateTime={notification.createdAt}>{new Date(notification.createdAt).toLocaleString("ko-KR")}</time><button type="button" className="text-link" disabled={busy} aria-label={`${notification.comment.nickname}님의 댓글 알림 삭제`} onClick={() => void mutate("/api/notifications", "DELETE", { id: notification.id })}>삭제</button></div>
           </article>)}
           {data && !data.comments.length && <p className="comment-hint">댓글 알림이 없습니다.</p>}

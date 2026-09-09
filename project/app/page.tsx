@@ -46,12 +46,13 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
           visibility: "PUBLIC",
         };
   const totalPosts = await prisma.post.count({ where });
-  const totalPages = Math.max(1, Math.ceil(totalPosts / 9));
+  const pageSize = 15;
+  const totalPages = Math.max(1, Math.ceil(totalPosts / pageSize));
   const params = await searchParams;
   const value = typeof params.page === "string" && /^\d+$/.test(params.page) ? Number(params.page) : 1;
   const currentPage = Math.min(totalPages, Math.max(1, Number.isSafeInteger(value) ? value : 1));
   const posts = await prisma.post.findMany({
-    where, take: 9, skip: (currentPage - 1) * 9,
+    where, take: pageSize, skip: (currentPage - 1) * pageSize,
     include: {
       _count: { select: { likes: true, views: true } },
       likes: { where: { userId: currentUserId ?? "" }, select: { userId: true } },

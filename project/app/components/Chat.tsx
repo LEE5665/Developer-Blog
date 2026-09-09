@@ -100,6 +100,7 @@ function ChatRoom({ id, userId }: { id: string; userId: string }) {
   const lastRead = useRef(0);
   const bottom = useRef(true);
   const pendingSend = useRef<{ content: string; clientId: string } | null>(null);
+  const compose = useRef<HTMLTextAreaElement>(null);
   const url = `/api/chat/${id}`;
   useEffect(() => {
     let cancelled = false, running = false, queued = false;
@@ -171,6 +172,7 @@ function ChatRoom({ id, userId }: { id: string; userId: string }) {
         newest.current = Math.max(newest.current, result.message.id);
         return [...next.values()].sort((a, b) => a.id - b.id);
       });
+      requestAnimationFrame(() => compose.current?.focus());
       window.dispatchEvent(new Event("chat-list-changed"));
     } catch (error) { setSendError(error instanceof Error ? error.message : "메시지를 보내지 못했습니다."); }
     finally { setSending(false); }
@@ -192,6 +194,6 @@ function ChatRoom({ id, userId }: { id: string; userId: string }) {
     </div>
     {peer && !canSend && <p className="chat-disabled">현재 친구가 아니므로 메시지를 보낼 수 없습니다.</p>}
     {sendError && <p role="alert" className="composer-error chat-send-error">{sendError}</p>}
-    <form className="chat-compose" onSubmit={send}><textarea aria-label="메시지 내용" placeholder="메시지 입력 (Enter 전송, Shift+Enter 줄바꿈)" rows={2} maxLength={2000} value={draft} disabled={sending || !canSend} onChange={(event) => setDraft(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); event.currentTarget.form?.requestSubmit(); } }} /><button type="submit" className="button button-primary" disabled={sending || !canSend || !draft.trim()}>{sending ? "전송 중" : "전송"}</button></form>
+    <form className="chat-compose" onSubmit={send}><textarea ref={compose} aria-label="메시지 내용" placeholder="메시지 입력 (Enter 전송, Shift+Enter 줄바꿈)" rows={2} maxLength={2000} value={draft} readOnly={sending || !canSend} onChange={(event) => setDraft(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); event.currentTarget.form?.requestSubmit(); } }} /><button type="submit" className="button button-primary" disabled={sending || !canSend || !draft.trim()}>{sending ? "전송 중" : "전송"}</button></form>
   </>;
 }

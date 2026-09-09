@@ -8,7 +8,7 @@ import { MyPageTabs } from "./MyPageTabs";
 import { blogData } from "@/lib/blog-data";
 import { BlogExplorer } from "@/app/components/BlogExplorer";
 
-export default async function MyPage({ searchParams }: { searchParams: Promise<{ tab?: string; post?: string; category?: string }> }) {
+export default async function MyPage({ searchParams }: { searchParams: Promise<{ tab?: string; post?: string; category?: string; page?: string }> }) {
   const session = await auth();
   if (!session?.user?.id) {
     redirect("/login");
@@ -43,7 +43,6 @@ export default async function MyPage({ searchParams }: { searchParams: Promise<{
   const friendCount =
     (user._count?.sentFriendRequests ?? 0) +
     (user._count?.receivedFriendRequests ?? 0);
-  const data = await blogData(user.id, user.id);
   const profileSelect = { id: true, name: true, nickname: true, tag: true, image: true, bio: true } as const;
   const friendships = await prisma.friendship.findMany({
     where: { status: "ACCEPTED", OR: [{ userId: user.id }, { friendId: user.id }] },
@@ -51,7 +50,9 @@ export default async function MyPage({ searchParams }: { searchParams: Promise<{
     select: { userId: true, user: { select: profileSelect }, friend: { select: profileSelect } },
   });
   const friends = friendships.map((friendship) => friendship.userId === user.id ? friendship.friend : friendship.user);
-  const { tab, post: selectedPost, category: selectedCategory } = await searchParams;
+  const { tab, post: selectedPost, category: selectedCategory, page } = await searchParams;
+  const selectedCategoryValue = selectedCategory || "all";
+  const pagedData = await blogData(user.id, user.id, Number(page) || 1, selectedCategoryValue);
 
   return (
       <main className="page-container space-y-8">
@@ -118,7 +119,7 @@ export default async function MyPage({ searchParams }: { searchParams: Promise<{
           friends={friends}
           initialTab={tab}
           likes={<LikedPosts userId={user.id} />}
-          posts={data && <BlogExplorer key={`${selectedPost || "list"}:${selectedCategory || "all"}`} data={data} embedded initialPostId={selectedPost} initialCategory={selectedCategory || "all"} />}
+          posts={pagedData && <BlogExplorer key={`${selectedPost || "list"}:${selectedCategoryValue}:${page || "1"}`} data={pagedData} embedded initialPostId={selectedPost} initialCategory={selectedCategoryValue} />}
         />
       </main>
 
