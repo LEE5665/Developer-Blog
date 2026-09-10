@@ -1,6 +1,7 @@
 name: Deploy Next.js to Oracle Cloud
 
 on:
+  workflow_dispatch:
   push:
     branches: ["main"]
 
