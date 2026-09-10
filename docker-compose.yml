@@ -33,7 +33,7 @@ services:
   postgres:
     image: postgres:17
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     restart: always
     environment:
       POSTGRES_DB: developer_blog
@@ -44,6 +44,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   db-backup:
+    profiles: ["backup"]
     build:
       context: ./project
       dockerfile: Dockerfile.backup
