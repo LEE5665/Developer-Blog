@@ -1,0 +1,42 @@
+name: Deploy Next.js to Oracle Cloud
+
+on:
+  push:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-oracle-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          command_timeout: 30m
+          script: |
+            set -e
+
+            # 1. 경로 이동 및 최신 코드 pull
+            cd /home/ubuntu/Developer-Blog
+            git pull --ff-only origin main
+
+            # 2. 패키지 설치 및 빌드
+            cd project
+            npm install
+            npx prisma generate --config prisma7.config.ts
+            npx prisma migrate deploy --config prisma7.config.ts
+            npm run build
+
+            # 3. PM2 재시작 (최초 배포 시 프로세스 생성)
+            pm2 reload blog || pm2 start npm --name "blog" -- run start
