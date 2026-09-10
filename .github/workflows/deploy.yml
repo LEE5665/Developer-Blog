@@ -1,7 +1,7 @@
 name: Deploy Next.js to Oracle Cloud
 
 on:
-  workflow_dispatch:
+  # workflow_dispatch:
   push:
     branches: ["main"]
 
@@ -17,27 +17,93 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: project/package-lock.json
+
+      - name: Install dependencies and build on GitHub
+        working-directory: project
+        env:
+          # Build-time placeholders only; production uses the server's .env.
+          DATABASE_URL: postgresql://build:build@127.0.0.1:5432/build
+          AUTH_SECRET: build-only-placeholder-not-for-production
+          NEXT_TELEMETRY_DISABLED: "1"
+        run: |
+          npm ci
+          npx prisma generate --config prisma7.config.ts
+          npm run build
+
+      - name: Package Next.js build
+        run: |
+          test -s project/.next/BUILD_ID
+          tar --exclude='.next/cache' -czf next-build.tar.gz -C project .next
+          sha256sum next-build.tar.gz > next-build.tar.gz.sha256
+
+      - name: Upload build to Oracle
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          source: next-build.tar.gz,next-build.tar.gz.sha256
+          target: /home/ubuntu/developer-blog-deploy/${{ github.run_id }}-${{ github.run_attempt }}
+          command_timeout: 10m
+
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          DEPLOY_SHA: ${{ github.sha }}
+          DEPLOY_ID: ${{ github.run_id }}-${{ github.run_attempt }}
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
           command_timeout: 30m
+          envs: DEPLOY_SHA,DEPLOY_ID
           script: |
-            set -e
+            set -eu
 
-            # 1. 경로 이동 및 최신 코드 pull
+            # 1. 전송 완료 및 빌드 결과 확인 (기존 서비스 변경 전)
+            incoming="/home/ubuntu/developer-blog-deploy/$DEPLOY_ID"
+            cd "$incoming"
+            sha256sum -c next-build.tar.gz.sha256
+            tar -xzf next-build.tar.gz
+            test -s .next/BUILD_ID
+
+            # 2. 빌드한 커밋과 서버 소스 버전을 일치시킴
             cd /home/ubuntu/Developer-Blog
-            git pull --ff-only origin main
+            git fetch origin main
+            git merge --ff-only "$DEPLOY_SHA"
+            if [ "$(git rev-parse HEAD)" != "$DEPLOY_SHA" ]; then
+              echo "Server source differs from the build commit; deployment stopped."
+              exit 1
+            fi
 
-            # 2. 패키지 설치 및 빌드
+            # 3. DB, Redis, 백업 서비스 실행 및 변경 반영
+            docker compose up -d --build --wait --wait-timeout 120
+
+            # 4. 서버 아키텍처에 맞는 의존성 설치 및 DB 마이그레이션
             cd project
-            npm install
+            npm ci
             npx prisma generate --config prisma7.config.ts
             npx prisma migrate deploy --config prisma7.config.ts
-            npm run build
 
-            # 3. PM2 재시작 (최초 배포 시 프로세스 생성)
+            # 5. GitHub에서 만든 빌드 적용 (서버에서 Next.js 빌드하지 않음)
+            if [ -e .next ]; then
+              mv .next "$incoming/previous.next"
+            fi
+            mv "$incoming/.next" .next
+
+            # 6. PM2 재시작 (최초 배포 시 프로세스 생성)
             pm2 reload blog || pm2 start npm --name "blog" -- run start
+
+            # 업로드 파일 정리. 직전 빌드는 장애 확인용으로 보관.
+            rm -f "$incoming/next-build.tar.gz" "$incoming/next-build.tar.gz.sha256"
