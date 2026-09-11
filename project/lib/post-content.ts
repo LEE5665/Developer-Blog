@@ -99,7 +99,9 @@ export function normalizeDocument(input: unknown, allowLegacyImages = false): Po
     if (Array.isArray(node.content)) result.content = node.content.map((child) => visit(child, depth + 1));
     if (node.type === "imageGroup") {
       if (!result.content || result.content.length < 2 || result.content.length > 3 || result.content.some(child => child.type !== "image")) throw new Error("이미지 묶음에는 사진 2~3장이 필요합니다.");
-      result.attrs = { widths: imageGroupWidths(attrs.widths, result.content.length).join(",") };
+      const mode = attrs.mode === "natural" ? "natural" : "fill";
+      const width = safeWidth(attrs.width) || "100%";
+      result.attrs = { widths: imageGroupWidths(attrs.widths, result.content.length).join(","), mode, width };
     }
     return result;
   }

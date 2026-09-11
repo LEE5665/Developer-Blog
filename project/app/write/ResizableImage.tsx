@@ -181,13 +181,13 @@ export const ResizableImage = ImageExtension.extend({
     return {
       ...this.parent?.(),
       width: {
-        default: null,
-        parseHTML: (element) => element.style.width || element.getAttribute("width") || null,
+        default: "100%",
+        parseHTML: (element) => element.style.width || element.getAttribute("width") || "100%",
         renderHTML: (attributes) => {
-          if (!attributes.width) return {};
+          const width = attributes.width || "100%";
           return {
-            style: `width: ${attributes.width}`,
-            width: attributes.width,
+            style: `width: ${width}`,
+            width,
           };
         },
       },

@@ -8,7 +8,11 @@ function renderNode(node: PostNode, key: number, context: { heading: number; pre
   const alignment = node.attrs?.textAlign as CSSProperties["textAlign"];
   const style = alignment ? { textAlign: alignment } : undefined;
   switch (node.type) {
-    case "imageGroup": return <div key={key} className="image-group" style={{ gridTemplateColumns: imageGroupWidths(node.attrs?.widths, node.content!.length).map(w => `${w}fr`).join(" ") }}>{children?.map((child, index) => <div className="image-group-cell" key={index}>{child}</div>)}</div>;
+    case "imageGroup": {
+      const modeClass = node.attrs?.mode === "natural" ? "image-group-natural" : "image-group-fill";
+      const groupWidth = node.attrs?.width ? String(node.attrs.width) : "100%";
+      return <div key={key} className={`image-group ${modeClass}`} style={{ gridTemplateColumns: imageGroupWidths(node.attrs?.widths, node.content!.length).map(w => `${w}fr`).join(" "), width: groupWidth, maxWidth: "100%", margin: "24px auto" }}>{children?.map((child, index) => <div className="image-group-cell" key={index}>{child}</div>)}</div>;
+    }
     case "text": {
       let text: ReactNode = node.text;
       for (const mark of node.marks || []) {

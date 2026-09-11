@@ -189,7 +189,7 @@ export function WriteForm({ categories, userId, initialPost }: { categories: Cat
     event.preventDefault();
     const url = insertMode === "image" ? safeImage(insertUrl.trim()) : safeLink(insertUrl.trim());
     if (!url) { setInsertError("http:// 또는 https://로 시작하는 올바른 주소를 입력해주세요."); return; }
-    if (insertMode === "image") editor?.chain().focus().setImage({ src: url, alt: imageAlt }).run();
+    if (insertMode === "image") editor?.chain().focus().setImage({ src: url, alt: imageAlt, width: "100%" } as never).run();
     else if (editor?.state.selection.empty && !editor.isActive("link")) editor.chain().focus().insertContent({ type: "text", text: url, marks: [{ type: "link", attrs: { href: url } }] }).run();
     else editor?.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
     setInsertMode(null);
@@ -211,7 +211,7 @@ export function WriteForm({ categories, userId, initialPost }: { categories: Cat
         if (!response.ok) throw new Error(result.error || "이미지를 업로드하지 못했습니다.");
         const src = safeImage(result.url);
         if (!src) throw new Error("이미지 주소를 확인할 수 없습니다.");
-        images.push({ type: "image", attrs: { src, alt: imageAlt || file.name } });
+        images.push({ type: "image", attrs: { src, alt: imageAlt || file.name, width: "100%" } });
       }
       if (editor.isDestroyed) return;
       const placeholder = uploadKey.getState(editor.state)?.find(undefined, undefined, spec => spec.id === id)[0];
