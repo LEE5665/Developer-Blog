@@ -40,6 +40,7 @@ export function WriteForm({ categories, userId, initialPost }: { categories: Cat
   const [error, setError] = useState<string | null>(null);
   const [draftMessage, setDraftMessage] = useState("서버 임시저장을 준비하고 있습니다");
   const [storedDraft, setStoredDraft] = useState<Draft | null>(null);
+  const [draftPromptOpen, setDraftPromptOpen] = useState(false);
   const [draftReady, setDraftReady] = useState(false);
   const [revision, setRevision] = useState(0);
   const [focusMode, setFocusMode] = useState(false);
@@ -93,15 +94,20 @@ export function WriteForm({ categories, userId, initialPost }: { categories: Cat
         if (cancelled) return;
         const draft = result.draft;
         draftVersion.current = draft?.version ?? null;
-        if (draft) setStoredDraft({ tags: draft.tags || [], title: draft.title, doc: normalizeDocument(readDocument(draft.content)), categoryId: draft.categoryId || "none", visibility: draft.visibility, savedAt: draft.updatedAt, version: draft.version });
-        else {
+        if (draft) {
+          setStoredDraft({ tags: draft.tags || [], title: draft.title, doc: normalizeDocument(readDocument(draft.content)), categoryId: draft.categoryId || "none", visibility: draft.visibility, savedAt: draft.updatedAt, version: draft.version });
+          setDraftPromptOpen(true);
+        } else {
           // Recover pre-existing browser drafts, then migrate them on the next save.
           try {
             const raw = localStorage.getItem(storageKey);
             if (raw) {
               const local = JSON.parse(raw) as Draft;
               local.doc = normalizeDocument(local.doc);
-              if (typeof local.title === "string" && ["PUBLIC", "PRIVATE", "FRIENDS"].includes(local.visibility)) setStoredDraft(local);
+              if (typeof local.title === "string" && ["PUBLIC", "PRIVATE", "FRIENDS"].includes(local.visibility)) {
+                setStoredDraft(local);
+                setDraftPromptOpen(true);
+              }
             }
           } catch { /* Invalid local drafts never replace a server draft. */ }
         }
@@ -158,10 +164,15 @@ export function WriteForm({ categories, userId, initialPost }: { categories: Cat
     setTocDepth(Number(storedDraft.doc.attrs?.tocDepth || 4));
     editor.commands.setContent(storedDraft.doc);
     setStoredDraft(null);
+    setDraftPromptOpen(false);
     changed();
   }
   async function discardDraft() {
-    if (!window.confirm("임시 글을 삭제할까요? 발행된 원본 글은 유지되며, 사용하지 않는 이미지는 24시간 후 정리됩니다.")) return;
+    const confirmMessage = initialPost
+      ? "임시 저장된 수정 내용을 삭제하고 수정 전 원래 글로 되돌릴까요?"
+      : "작성 중이던 임시 글을 삭제할까요? 임시로 적었던 글이 제거되고 빈 글에서 새로 시작합니다.";
+    if (!window.confirm(confirmMessage)) return;
+    setDraftPromptOpen(false);
     savingPaused.current = true;
     setLoading(true);
     await pendingSave.current;
@@ -177,7 +188,7 @@ export function WriteForm({ categories, userId, initialPost }: { categories: Cat
       setShowToc(initialPost ? readDocument(initialPost.content)?.attrs?.toc !== "hidden" : true);
       setTocDepth(Number(initialPost ? readDocument(initialPost.content)?.attrs?.tocDepth || 4 : 4));
       editor?.commands.setContent(initialDocument, { emitUpdate: false });
-      setDraftMessage("임시 글이 삭제되었습니다"); setError(null);
+      setDraftMessage(initialPost ? "수정 전 원래 글로 되돌렸습니다" : "임시 글이 삭제되었습니다"); setError(null);
     } catch (error) { setError(error instanceof Error ? error.message : "임시 글 삭제에 실패했습니다."); }
     finally { savingPaused.current = false; setLoading(false); }
   }
@@ -260,7 +271,6 @@ export function WriteForm({ categories, userId, initialPost }: { categories: Cat
         <div className="flex items-center gap-3"><Link href="/" className="composer-back" aria-label="피드로 돌아가기" onClick={(event) => { if (dirty.current && !window.confirm("아직 저장하지 못한 내용이 있습니다. 나가시겠습니까?")) event.preventDefault(); }}><Icon name="back" width={18} height={18} /></Link><h1>{initialPost ? "글 수정" : "글쓰기"}</h1><span className="composer-top-hint">새로운 이야기의 시작</span></div>
         <button type="button" className="composer-focus-button" aria-pressed={focusMode} onClick={() => setFocusMode(!focusMode)}><Icon name="monitor" width={16} height={16} />{focusMode ? "집중 모드 종료" : "집중 모드"}</button>
       </div>
-      {storedDraft && <div className="draft-recovery" role="status"><div><strong>작성 중이던 글이 있어요</strong><p>{storedDraft.title || "제목 없는 글"} · {new Date(storedDraft.savedAt).toLocaleDateString("ko-KR")}</p></div><div className="flex gap-2"><button type="button" onClick={discardDraft}>새로 쓰기</button><button type="button" className="button button-primary" onClick={restoreDraft} disabled={!editor}>이어서 쓰기</button></div></div>}
       <div className="composer-outline-settings">
         <label><input type="checkbox" checked={showToc} disabled={!draftReady || !!storedDraft || loading} onChange={(event) => { setShowToc(event.target.checked); changed(); }} />글에 목차 표시</label>
         <select aria-label="목차에 포함할 제목 단계" value={tocDepth} disabled={!showToc || !draftReady || !!storedDraft || loading} onChange={(event) => { setTocDepth(Number(event.target.value)); changed(); }}><option value={2}>제목 1만</option><option value={3}>제목 1·2</option><option value={4}>제목 1·2·3</option></select>
@@ -291,8 +301,35 @@ export function WriteForm({ categories, userId, initialPost }: { categories: Cat
       </div>
       <div className="composer-bottom-bar">
         <div className="composer-save-info"><span className="save-dot" /><span role="status">{draftMessage}</span><span className="composer-word-count">{(editorState?.count || 0).toLocaleString()}자</span></div>
-        <div className="composer-actions"><button type="button" className="button button-secondary" disabled={!editor || !draftReady || loading || imageBusy} onClick={() => void discardDraft()}>임시 글 삭제</button><button type="button" className="button button-secondary" disabled={!editor || !draftReady || !!storedDraft || loading || imageBusy} onClick={() => { try { setPreviewContent(serializeDocument({ ...editor?.getJSON(), attrs: { toc: showToc ? "shown" : "hidden", tocDepth } })); } catch (err) { setError(err instanceof Error ? err.message : "미리보기를 열 수 없습니다."); } }}>미리보기</button><button type="button" className="button button-secondary" disabled={!editor || !draftReady || !!storedDraft || loading || imageBusy} onClick={() => void saveDraft()}>임시저장</button><button type="button" className="button button-accent" disabled={!editor || !draftReady || !!storedDraft || loading || imageBusy} onClick={preparePublish}>완료<Icon name="arrow" width={15} height={15} /></button></div>
+        <div className="composer-actions"><button type="button" className="button button-secondary" disabled={!editor || !draftReady || loading || imageBusy} onClick={() => void discardDraft()}>{initialPost ? "수정 전으로 되돌리기" : "임시 글 삭제"}</button><button type="button" className="button button-secondary" disabled={!editor || !draftReady || !!storedDraft || loading || imageBusy} onClick={() => { try { setPreviewContent(serializeDocument({ ...editor?.getJSON(), attrs: { toc: showToc ? "shown" : "hidden", tocDepth } })); } catch (err) { setError(err instanceof Error ? err.message : "미리보기를 열 수 없습니다."); } }}>미리보기</button><button type="button" className="button button-secondary" disabled={!editor || !draftReady || !!storedDraft || loading || imageBusy} onClick={() => void saveDraft()}>임시저장</button><button type="button" className="button button-accent" disabled={!editor || !draftReady || !!storedDraft || loading || imageBusy} onClick={preparePublish}>완료<Icon name="arrow" width={15} height={15} /></button></div>
       </div>
+
+      <Modal open={draftPromptOpen && !!storedDraft} closable={false} title={initialPost ? "수정 중이던 임시 글 복구" : "작성 중이던 임시 글 복구"}>
+        <div className="modal-form">
+          <p className="text-sm" style={{ lineHeight: "1.6" }}>
+            {initialPost
+              ? "이전에 수정 중이던 임시 저장 내용이 있습니다. 이어서 수정하시겠습니까, 아니면 임시 내용을 삭제하고 수정 전 원래 글로 되돌리시겠습니까?"
+              : "이전에 작성 중이던 임시 저장 글이 있습니다. 이어서 작성하시겠습니까, 아니면 임시로 적었던 글을 삭제하고 새로 작성하시겠습니까?"}
+          </p>
+          <div className="publish-summary" style={{ margin: "4px 0" }}>
+            <span>{initialPost ? "임시 저장된 수정 제목" : "임시 저장된 글 제목"}</span>
+            <strong style={{ fontSize: "15px" }}>{storedDraft?.title || "제목 없는 글"}</strong>
+            {storedDraft && (
+              <span style={{ fontSize: "11px", color: "var(--muted)", marginTop: "2px" }}>
+                {new Date(storedDraft.savedAt).toLocaleString("ko-KR", { year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" })} 저장됨
+              </span>
+            )}
+          </div>
+          <div className="modal-actions">
+            <button type="button" className="button button-secondary" onClick={() => void discardDraft()}>
+              {initialPost ? "수정 전으로 되돌리기" : "새로 쓰기"}
+            </button>
+            <button type="button" className="button button-primary" onClick={restoreDraft} disabled={!editor}>
+              {initialPost ? "수정 이어하기" : "이어서 쓰기"}
+            </button>
+          </div>
+        </div>
+      </Modal>
 
       <Modal open={previewContent !== null} onClose={() => setPreviewContent(null)} title="미리보기" wide>
         <article className="composer-preview"><span className="eyebrow">PREVIEW</span><h1>{title || "제목 없는 글"}</h1>{previewContent && <PostContent content={previewContent} />}</article>

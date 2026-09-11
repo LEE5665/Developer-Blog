@@ -118,7 +118,7 @@ function ImageGroupView({ node, updateAttributes, editor, getPos }: NodeViewProp
         if (typeof pos !== "number") return;
         const next = editor.state.doc.nodeAt(pos + node.nodeSize);
         if (next?.type.name === "image") editor.chain().focus().insertContentAt({ from: pos, to: pos + node.nodeSize + next.nodeSize }, { type: "imageGroup", content: [...images, next.toJSON()] }).run();
-      }}>다음 사진 합치기</button>}
+      }}>아래 사진 합치기</button>}
     </div>
     <div
       ref={containerRef}

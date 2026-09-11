@@ -101,7 +101,7 @@ export function ResizableImageComponent({ node, updateAttributes, selected, dele
                 if (typeof pos !== "number") return;
                 const next = editor.state.doc.nodeAt(pos + node.nodeSize);
                 if (next?.type.name === "image") editor.chain().focus().insertContentAt({ from: pos, to: pos + node.nodeSize + next.nodeSize }, { type: "imageGroup", content: [node.toJSON(), next.toJSON()] }).run();
-              }} disabled={(() => { const pos = getPos(); return typeof pos !== "number" || editor.state.doc.nodeAt(pos + node.nodeSize)?.type.name !== "image"; })()}>다음 사진과 묶기</button>
+              }} disabled={(() => { const pos = getPos(); return typeof pos !== "number" || editor.state.doc.nodeAt(pos + node.nodeSize)?.type.name !== "image"; })()}>아래 사진과 묶기</button>
               <div
                 className="resize-btn resize-drag-btn"
                 data-drag-handle
