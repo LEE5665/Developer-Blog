@@ -1,5 +1,6 @@
 import { Fragment, type ReactNode, type CSSProperties } from "react";
-import { readDocument, type PostNode } from "@/lib/post-content";
+import { PostImage } from "./PostImage";
+import { imageGroupWidths, readDocument, type PostNode } from "@/lib/post-content";
 
 function renderNode(node: PostNode, key: number, context: { heading: number; prefix: string }): ReactNode {
   const headingId = node.type === "heading" ? `${context.prefix}-section-${++context.heading}` : undefined;
@@ -7,6 +8,7 @@ function renderNode(node: PostNode, key: number, context: { heading: number; pre
   const alignment = node.attrs?.textAlign as CSSProperties["textAlign"];
   const style = alignment ? { textAlign: alignment } : undefined;
   switch (node.type) {
+    case "imageGroup": return <div key={key} className="image-group" style={{ gridTemplateColumns: imageGroupWidths(node.attrs?.widths, node.content!.length).map(w => `${w}fr`).join(" ") }}>{children?.map((child, index) => <div className="image-group-cell" key={index}>{child}</div>)}</div>;
     case "text": {
       let text: ReactNode = node.text;
       for (const mark of node.marks || []) {
@@ -34,10 +36,9 @@ function renderNode(node: PostNode, key: number, context: { heading: number; pre
     case "horizontalRule": return <hr key={key} />;
     case "hardBreak": return <br key={key} />;
     // User-supplied remote and embedded images cannot use a fixed Next image host list.
-    // eslint-disable-next-line @next/next/no-img-element
     case "image": {
       const width = node.attrs?.width ? String(node.attrs.width) : undefined;
-      return <img key={key} src={String(node.attrs?.src)} alt={String(node.attrs?.alt || "")} title={node.attrs?.title ? String(node.attrs.title) : undefined} style={width ? { width } : undefined} loading="lazy" referrerPolicy="no-referrer" />;
+      return <PostImage key={key} src={String(node.attrs?.src)} alt={String(node.attrs?.alt || "")} title={node.attrs?.title ? String(node.attrs.title) : undefined} width={width} />;
     }
     default: return <Fragment key={key}>{children}</Fragment>;
   }

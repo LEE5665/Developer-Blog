@@ -1,11 +1,13 @@
 "use client";
+import { UserName } from "@/app/components/UserName";
+
 
 import Link from "next/link";
 import { createPortal } from "react-dom";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Avatar } from "./Avatar";
 
-type Peer = { id: string; name: string | null; nickname: string | null; image: string | null };
+type Peer = { id: string; name: string | null; nickname: string | null; tag?: string | null; image: string | null };
 type Message = { id: number; senderId: string; content: string; createdAt: string };
 type Conversation = { id: string; peer: Peer; lastMessage: Message | null; unread: number };
 type Page = { messages: Message[]; peer: Peer; peerRead: number; canSend: boolean; hasMore: boolean };
@@ -78,7 +80,7 @@ export function Chat({ userId }: { userId: string }) {
         {loading && <p role="status" className="comment-hint">대화를 여는 중...</p>}
         {error && <p role="alert" className="composer-error">{error} <button type="button" className="text-link" onClick={() => void load()}>다시 불러오기</button></p>}
         {!conversations.length && !loading && !error && <div className="empty-state"><h3>친구와 이야기를 나눠보세요</h3><p>친구관리 또는 친구 블로그에서 메시지를 보낼 수 있습니다.</p><Link href="/mypage?tab=friends" className="button button-secondary" onClick={() => setOpen(false)}>친구관리</Link></div>}
-        {conversations.map((room) => <button type="button" key={room.id} className="chat-conversation" disabled={loading} onClick={() => setRoomId(room.id)}><Avatar src={room.peer.image} name={room.peer.name} size={40} /><span className="chat-conversation-text"><strong>{room.peer.nickname || room.peer.name || "개발자"}</strong><span>{room.lastMessage?.content || "새로운 대화를 시작하세요."}</span></span><span className="chat-conversation-meta">{room.lastMessage && <time dateTime={room.lastMessage.createdAt}>{new Date(room.lastMessage.createdAt).toLocaleDateString("ko-KR", { month: "numeric", day: "numeric" })}</time>}{room.unread > 0 && <b>{room.unread}</b>}</span></button>)}
+        {conversations.map((room) => <button type="button" key={room.id} className="chat-conversation" disabled={loading} onClick={() => setRoomId(room.id)}><Avatar src={room.peer.image} name={room.peer.nickname} size={40} /><span className="chat-conversation-text"><strong><UserName user={room.peer} /></strong><span>{room.lastMessage?.content || "새로운 대화를 시작하세요."}</span></span><span className="chat-conversation-meta">{room.lastMessage && <time dateTime={room.lastMessage.createdAt}>{new Date(room.lastMessage.createdAt).toLocaleDateString("ko-KR", { month: "numeric", day: "numeric" })}</time>}{room.unread > 0 && <b>{room.unread}</b>}</span></button>)}
       </div>}
     </section>, document.body)}
   </>;
@@ -178,7 +180,7 @@ function ChatRoom({ id, userId }: { id: string; userId: string }) {
     finally { setSending(false); }
   }
   return <>
-    {peer && <Link className="chat-peer" href={`/blog/${peer.id}`}><Avatar src={peer.image} name={peer.name} size={30} /><strong>{peer.nickname || peer.name || "개발자"}</strong></Link>}
+    {peer && <Link className="chat-peer" href={`/blog/${peer.id}`}><Avatar src={peer.image} name={peer.nickname} size={30} /><strong><UserName user={peer} /></strong></Link>}
     <div ref={scroll} className="chat-messages" onScroll={() => {
       const element = scroll.current;
       if (!element) return;

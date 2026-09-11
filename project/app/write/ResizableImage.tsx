@@ -4,7 +4,7 @@ import { useRef, useState, useCallback } from "react";
 import { NodeViewWrapper, type NodeViewProps, ReactNodeViewRenderer } from "@tiptap/react";
 import ImageExtension from "@tiptap/extension-image";
 
-export function ResizableImageComponent({ node, updateAttributes, selected, deleteNode }: NodeViewProps) {
+export function ResizableImageComponent({ node, updateAttributes, selected, deleteNode, editor, getPos }: NodeViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
   const [isResizing, setIsResizing] = useState(false);
@@ -96,6 +96,12 @@ export function ResizableImageComponent({ node, updateAttributes, selected, dele
             </div>
 
             <div className="resize-toolbar">
+              <button type="button" className="resize-btn" onMouseDown={e => e.preventDefault()} onClick={() => {
+                const pos = getPos();
+                if (typeof pos !== "number") return;
+                const next = editor.state.doc.nodeAt(pos + node.nodeSize);
+                if (next?.type.name === "image") editor.chain().focus().insertContentAt({ from: pos, to: pos + node.nodeSize + next.nodeSize }, { type: "imageGroup", content: [node.toJSON(), next.toJSON()] }).run();
+              }} disabled={(() => { const pos = getPos(); return typeof pos !== "number" || editor.state.doc.nodeAt(pos + node.nodeSize)?.type.name !== "image"; })()}>다음 사진과 묶기</button>
               <div
                 className="resize-btn resize-drag-btn"
                 data-drag-handle

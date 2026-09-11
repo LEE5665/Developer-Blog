@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { EditorContent, useEditor, useEditorState, type JSONContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import { ImageGroup } from "./ImageGroup";
+import { ImageUpload, uploadKey } from "./ImageUpload";
 import { ResizableImage } from "./ResizableImage";
 import Placeholder from "@tiptap/extension-placeholder";
 import { TextStyle, FontSize } from "@tiptap/extension-text-style";
@@ -48,6 +50,10 @@ export function WriteForm({ categories, userId, initialPost }: { categories: Cat
   const [imageAlt, setImageAlt] = useState("");
   const [insertError, setInsertError] = useState<string | null>(null);
   const [imageBusy, setImageBusy] = useState(false);
+  const [imageLayout, setImageLayout] = useState("separate");
+  const [failedUpload, setFailedUpload] = useState<{ files: File[]; grouped: boolean } | null>(null);
+  const uploadBusy = useRef(false);
+  const pasteUpload = useRef<(files: File[]) => void>(() => {});
   const dirty = useRef(false);
   const revisionRef = useRef(0);
   const draftVersion = useRef<number | null>(null);
@@ -62,12 +68,17 @@ export function WriteForm({ categories, userId, initialPost }: { categories: Cat
       StarterKit.configure({ heading: { levels: [2, 3, 4] }, link: { openOnClick: false, defaultProtocol: "https", protocols: ["http", "https", "mailto"] } }),
       TextStyle, FontSize, Highlight.configure({ multicolor: true }),
       Placeholder.configure({ placeholder: "이곳에 당신의 이야기를 들려주세요." }),
+      ImageGroup, ImageUpload,
       ResizableImage.configure({ allowBase64: false }),
       TextAlign.configure({ types: ["heading", "paragraph"] }),
     ],
     immediatelyRender: false,
     content: initialDocument,
-    editorProps: { attributes: { class: "rich-prose composer-body", role: "textbox", "aria-label": "글 본문", "aria-multiline": "true" } },
+    editorProps: { handlePaste: (_view, event) => {
+      const files = Array.from(event.clipboardData?.items || []).filter(item => item.kind === "file" && item.type.startsWith("image/")).map(item => item.getAsFile()).filter((file): file is File => !!file);
+      if (!files.length) return false;
+      event.preventDefault(); pasteUpload.current(files); return true;
+    }, attributes: { class: "rich-prose composer-body", role: "textbox", "aria-label": "글 본문", "aria-multiline": "true" } },
     onUpdate: () => { dirty.current = true; revisionRef.current += 1; setRevision((value) => value + 1); },
   });
   // Keep toolbar state in sync with the caret and undo history, not just typing.
@@ -130,7 +141,7 @@ export function WriteForm({ categories, userId, initialPost }: { categories: Cat
 
   useEffect(() => {
     const warn = (event: BeforeUnloadEvent) => {
-      if (dirty.current && !published.current) { event.preventDefault(); event.returnValue = ""; }
+      if ((dirty.current || uploadBusy.current) && !published.current) { event.preventDefault(); event.returnValue = ""; }
     };
     window.addEventListener("beforeunload", warn);
     return () => window.removeEventListener("beforeunload", warn);
@@ -183,27 +194,46 @@ export function WriteForm({ categories, userId, initialPost }: { categories: Cat
     else editor?.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
     setInsertMode(null);
   }
-  async function insertFile(file?: File) {
-    if (!file || !editor) return;
-    if (!["image/png", "image/jpeg", "image/webp"].includes(file.type) || file.size > 10 * 1024 * 1024) {
+  async function insertFiles(files: File[], grouped = false) {
+    if (!files.length || !editor || uploadBusy.current || !draftReady || storedDraft || loading) return;
+    if (files.some(file => !["image/png", "image/jpeg", "image/webp"].includes(file.type) || file.size > 10 * 1024 * 1024)) {
       setInsertError("10MB 이하의 JPG, PNG, WebP 이미지를 선택해주세요."); return;
     }
-    setImageBusy(true); setInsertError(null);
+    uploadBusy.current = true; setImageBusy(true); setInsertError(null); setFailedUpload(null);
+    const id = crypto.randomUUID();
+    editor.view.dispatch(editor.state.tr.setMeta(uploadKey, { add: true, id, pos: editor.state.selection.from }));
     try {
-      const form = new FormData();
-      form.append("file", file);
-      const response = await fetch("/api/images", { method: "POST", body: form });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || "이미지를 업로드하지 못했습니다.");
-      const src = safeImage(result.url);
-      if (!src) throw new Error("이미지 주소를 확인할 수 없습니다.");
-      editor.chain().focus().setImage({ src, alt: imageAlt || file.name }).run();
+      const images: JSONContent[] = [];
+      for (const file of files) {
+        const form = new FormData(); form.append("file", file);
+        const response = await fetch("/api/images", { method: "POST", body: form });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || "이미지를 업로드하지 못했습니다.");
+        const src = safeImage(result.url);
+        if (!src) throw new Error("이미지 주소를 확인할 수 없습니다.");
+        images.push({ type: "image", attrs: { src, alt: imageAlt || file.name } });
+      }
+      if (editor.isDestroyed) return;
+      const placeholder = uploadKey.getState(editor.state)?.find(undefined, undefined, spec => spec.id === id)[0];
+      if (placeholder) {
+        const content: JSONContent[] = [];
+        for (let i = 0; i < images.length; i += grouped ? 3 : 1) {
+          const batch = images.slice(i, i + (grouped ? 3 : 1));
+          content.push(batch.length > 1 ? { type: "imageGroup", content: batch } : batch[0]);
+        }
+        editor.chain().insertContentAt(placeholder.from, content).run();
+      }
       setInsertMode(null);
-    } catch (err) { setInsertError(err instanceof Error ? err.message : "이미지를 업로드하지 못했습니다."); }
-    finally { setImageBusy(false); if (fileInput.current) fileInput.current.value = ""; }
+    } catch (err) { setInsertError(err instanceof Error ? err.message : "이미지를 업로드하지 못했습니다."); setFailedUpload({ files, grouped }); }
+    finally {
+      if (!editor.isDestroyed) editor.view.dispatch(editor.state.tr.setMeta(uploadKey, { remove: true, id }));
+      uploadBusy.current = false; setImageBusy(false); if (fileInput.current) fileInput.current.value = "";
+    }
   }
+  useEffect(() => { pasteUpload.current = files => { void insertFiles(files); }; });
 
   function preparePublish() {
+    if (uploadBusy.current) return;
     setError(null);
     if (!title.trim()) { setError("제목을 입력해주세요."); titleInput.current?.focus(); return; }
     if (!editor || !hasDocumentContent(normalizeDocument(editor.getJSON()))) { setError("본문을 입력하거나 이미지를 추가해주세요."); editor?.commands.focus(); return; }
@@ -211,7 +241,7 @@ export function WriteForm({ categories, userId, initialPost }: { categories: Cat
   }
   async function publish(event: React.FormEvent) {
     event.preventDefault();
-    if (!editor || loading) return;
+    if (!editor || loading || uploadBusy.current) return;
     setLoading(true); setError(null); savingPaused.current = true;
     await pendingSave.current;
     try {
@@ -250,6 +280,9 @@ export function WriteForm({ categories, userId, initialPost }: { categories: Cat
             });
           }}>{item.text}</button></li>)}</ol><p>목차의 제목을 누르면 해당 위치를 편집할 수 있습니다.</p></details>}
           {error && !publishOpen && <p role="alert" className="composer-error">{error}</p>}
+          {imageBusy && <p role="status">이미지를 업로드하고 있습니다…</p>}
+          {insertError && !insertMode && <p role="alert" className="composer-error">{insertError}</p>}
+          {failedUpload && <button type="button" className="button button-secondary" disabled={imageBusy} onClick={() => void insertFiles(failedUpload.files, failedUpload.grouped)}>이미지 업로드 재시도</button>}
           <div className="composer-editor-wrap" inert={!draftReady || !!storedDraft || loading}>
             <EditorContent editor={editor} />
             {!editor && <p className="text-muted py-8 text-sm">편집기를 준비하고 있습니다...</p>}
@@ -258,7 +291,7 @@ export function WriteForm({ categories, userId, initialPost }: { categories: Cat
       </div>
       <div className="composer-bottom-bar">
         <div className="composer-save-info"><span className="save-dot" /><span role="status">{draftMessage}</span><span className="composer-word-count">{(editorState?.count || 0).toLocaleString()}자</span></div>
-        <div className="composer-actions"><button type="button" className="button button-secondary" disabled={!editor || !draftReady || loading} onClick={() => void discardDraft()}>임시 글 삭제</button><button type="button" className="button button-secondary" disabled={!editor || !draftReady || !!storedDraft || loading} onClick={() => { try { setPreviewContent(serializeDocument({ ...editor?.getJSON(), attrs: { toc: showToc ? "shown" : "hidden", tocDepth } })); } catch (err) { setError(err instanceof Error ? err.message : "미리보기를 열 수 없습니다."); } }}>미리보기</button><button type="button" className="button button-secondary" disabled={!editor || !draftReady || !!storedDraft || loading} onClick={() => void saveDraft()}>임시저장</button><button type="button" className="button button-accent" disabled={!editor || !draftReady || !!storedDraft || loading} onClick={preparePublish}>완료<Icon name="arrow" width={15} height={15} /></button></div>
+        <div className="composer-actions"><button type="button" className="button button-secondary" disabled={!editor || !draftReady || loading || imageBusy} onClick={() => void discardDraft()}>임시 글 삭제</button><button type="button" className="button button-secondary" disabled={!editor || !draftReady || !!storedDraft || loading || imageBusy} onClick={() => { try { setPreviewContent(serializeDocument({ ...editor?.getJSON(), attrs: { toc: showToc ? "shown" : "hidden", tocDepth } })); } catch (err) { setError(err instanceof Error ? err.message : "미리보기를 열 수 없습니다."); } }}>미리보기</button><button type="button" className="button button-secondary" disabled={!editor || !draftReady || !!storedDraft || loading || imageBusy} onClick={() => void saveDraft()}>임시저장</button><button type="button" className="button button-accent" disabled={!editor || !draftReady || !!storedDraft || loading || imageBusy} onClick={preparePublish}>완료<Icon name="arrow" width={15} height={15} /></button></div>
       </div>
 
       <Modal open={previewContent !== null} onClose={() => setPreviewContent(null)} title="미리보기" wide>
@@ -266,7 +299,7 @@ export function WriteForm({ categories, userId, initialPost }: { categories: Cat
       </Modal>
       <Modal open={insertMode !== null} onClose={() => { if (!imageBusy) setInsertMode(null); }} title={insertMode === "image" ? "이미지 삽입" : "링크 삽입"}>
         <form onSubmit={insertFromUrl} className="modal-form">
-          {insertMode === "image" && <><button type="button" className="image-upload-area" disabled={imageBusy} onClick={() => fileInput.current?.click()}><Icon name="file" width={26} height={26} /><strong>{imageBusy ? "이미지를 업로드하고 있습니다..." : "내 컴퓨터에서 이미지 선택"}</strong><span>JPG, PNG, WebP · 최대 10MB · 자동 크기 조정</span></button><input ref={fileInput} type="file" accept="image/png,image/jpeg,image/webp" hidden onChange={(event) => void insertFile(event.target.files?.[0])} /><p className="text-xs text-muted text-center">또는 이미지 주소로 삽입</p></>}
+          {insertMode === "image" && <><label>여러 이미지 배치<select value={imageLayout} onChange={event => setImageLayout(event.target.value)} disabled={imageBusy}><option value="separate">각각 넣기</option><option value="group">나란히 넣기 (한 줄 최대 3장)</option></select></label><button type="button" className="image-upload-area" disabled={imageBusy} onClick={() => fileInput.current?.click()}><Icon name="file" width={26} height={26} /><strong>{imageBusy ? "이미지를 업로드하고 있습니다..." : "내 컴퓨터에서 이미지 선택"}</strong><span>JPG, PNG, WebP · 최대 10MB · 자동 크기 조정</span></button><input ref={fileInput} type="file" multiple accept="image/png,image/jpeg,image/webp" hidden onChange={(event) => void insertFiles(Array.from(event.target.files || []), imageLayout === "group")} /><p className="text-xs text-muted text-center">또는 이미지 주소로 삽입</p></>}
           <label htmlFor="insert-url">{insertMode === "image" ? "이미지 주소" : "링크 주소"}</label><input id="insert-url" type="url" required placeholder="https://" value={insertUrl} onChange={(event) => setInsertUrl(event.target.value)} disabled={imageBusy} />
           {insertMode === "image" && <><label htmlFor="image-description">이미지 설명 (선택)</label><input id="image-description" value={imageAlt} onChange={(event) => setImageAlt(event.target.value)} placeholder="이미지에 대한 짧은 설명" maxLength={300} /></>}
           {insertError && <p role="alert" className="composer-error">{insertError}</p>}

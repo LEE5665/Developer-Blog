@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { checkMutation, limitAction } from "@/lib/engagement";
 import { PostError, postFailure } from "@/lib/post-service";
+import { sendFriendRequest } from "@/lib/friend-request";
 
 export async function DELETE(request: Request, { params }: { params: Promise<{ userId: string }> }) {
   try {
@@ -28,16 +29,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ use
     const { userId: recipientId } = await params;
     if (senderId === recipientId) throw new PostError("자신에게 친구 요청을 보낼 수 없습니다.");
     await limitAction(request, "friend-request", senderId, 20);
-    const friendship = await prisma.$transaction(async (tx) => {
-      // Serialize both directions of a pair to prevent duplicate and crossed requests.
-      const pair = JSON.stringify([senderId, recipientId].sort());
-      await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtextextended(${pair}, 0))::text`;
-      if (!await tx.user.findUnique({ where: { id: recipientId }, select: { id: true } })) throw new PostError("사용자를 찾을 수 없습니다.", 404);
-      const existing = await tx.friendship.findFirst({ where: { OR: [{ userId: senderId, friendId: recipientId }, { userId: recipientId, friendId: senderId }] } });
-      if (existing) return existing;
-      return tx.friendship.create({ data: { userId: senderId, friendId: recipientId } });
-    });
-    await publishUserEvents([senderId, recipientId], { type: "friends" });
+    const friendship = await sendFriendRequest(senderId, recipientId);
     return Response.json({ friendship });
   } catch (error) { return postFailure(error); }
 }

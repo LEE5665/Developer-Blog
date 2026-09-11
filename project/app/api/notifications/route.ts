@@ -9,10 +9,10 @@ export async function GET() {
     const userId = (await auth())?.user?.id;
     if (!userId) throw new PostError("로그인이 필요합니다.", 401);
     const [requests, comments] = await Promise.all([
-      prisma.friendship.findMany({ where: { friendId: userId, status: "PENDING" }, orderBy: [{ createdAt: "desc" }, { id: "desc" }], select: { id: true, createdAt: true, user: { select: { id: true, name: true, nickname: true, image: true } } } }),
-      prisma.notification.findMany({ where: { recipientId: userId }, orderBy: [{ createdAt: "desc" }, { id: "desc" }], select: { id: true, createdAt: true, comment: { select: { id: true, parentId: true, nickname: true, content: true, post: { select: { id: true, title: true } } } } } }),
+      prisma.friendship.findMany({ where: { friendId: userId, status: "PENDING" }, orderBy: [{ createdAt: "desc" }, { id: "desc" }], select: { id: true, createdAt: true, user: { select: { id: true, name: true, tag: true, nickname: true, image: true } } } }),
+      prisma.notification.findMany({ where: { recipientId: userId }, orderBy: [{ createdAt: "desc" }, { id: "desc" }], select: { id: true, createdAt: true, comment: { select: { id: true, parentId: true, nickname: true, anonymous: true, author: { select: { nickname: true, tag: true } }, content: true, post: { select: { id: true, title: true } } } } } }),
     ]);
-    return Response.json({ requests, comments }, { headers: { "Cache-Control": "private, no-store" } });
+    return Response.json({ requests, comments: comments.map(item => ({ ...item, comment: { ...item.comment, nickname: item.comment.anonymous ? item.comment.nickname : item.comment.author?.nickname || "개발자", tag: item.comment.anonymous ? null : item.comment.author?.tag } })) }, { headers: { "Cache-Control": "private, no-store" } });
   } catch (error) { return postFailure(error); }
 }
 

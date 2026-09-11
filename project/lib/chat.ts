@@ -2,7 +2,7 @@ import prisma from "./prisma";
 import type { Prisma } from "@/generated/prisma/client";
 import { PostError } from "./post-service";
 
-export const chatProfile = { id: true, name: true, nickname: true, image: true } as const;
+export const chatProfile = { id: true, name: true, tag: true, nickname: true, image: true } as const;
 export function pairWhere(a: string, b: string) { return { OR: [{ userId: a, friendId: b }, { userId: b, friendId: a }] }; }
 export async function lockPair(tx: Prisma.TransactionClient, a: string, b: string) {
   const pair = JSON.stringify([a, b].sort());

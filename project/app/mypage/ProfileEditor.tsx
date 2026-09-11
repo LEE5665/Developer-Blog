@@ -169,7 +169,7 @@ export function ProfileEditor({ user }: { user: UserProfile }) {
           {user.image ? (
             <Image
               src={user.image}
-              alt={user.name || "프로필 이미지"}
+              alt={user.nickname || "프로필 이미지"}
               width={56}
               height={56}
               className="rounded-full border border-zinc-200 dark:border-zinc-700 shadow-xs"

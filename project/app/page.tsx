@@ -11,7 +11,7 @@ import { postExcerpt, readDocument, imageSources } from "@/lib/post-content";
 export default async function HomePage({ searchParams }: { searchParams: Promise<{ page?: string | string[] }> }) {
   const session = await auth();
   const currentUserId = session?.user?.id;
-  const user = session?.user;
+  const user = currentUserId ? await prisma.user.findUnique({ where: { id: currentUserId }, select: { nickname: true } }) : null;
 
   // 1. 현재 사용자의 '친구' 목록 조회 (친구 공개 글을 볼 권한 확인용)
   let friendIds: string[] = [];
@@ -122,7 +122,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
           <PopularPosts rankings={rankings} currentUserId={currentUserId} />
         </section>
         <aside className="feed-aside">
-          <div className="aside-card"><span className="eyebrow">YOUR WORKSPACE</span><h3>{user ? (user.name || "개발자") + " 님의 기록 공간" : "기록이 습관이 되는 곳"}</h3><p>글을 모으고, 주제별로 정리하고,<br />앞으로의 계획을 세워보세요.</p><Link href={user ? "/mypage" : "/signup"} className="button button-secondary">{user ? "마이페이지" : "나만의 공간 만들기"}<Icon name="arrow" width={14} height={14} /></Link></div>
+          <div className="aside-card"><span className="eyebrow">YOUR WORKSPACE</span><h3>{user ? (user.nickname || "개발자") + " 님의 기록 공간" : "기록이 습관이 되는 곳"}</h3><p>글을 모으고, 주제별로 정리하고,<br />앞으로의 계획을 세워보세요.</p><Link href={user ? "/mypage" : "/signup"} className="button button-secondary">{user ? "마이페이지" : "나만의 공간 만들기"}<Icon name="arrow" width={14} height={14} /></Link></div>
           <div className="aside-card"><Icon name="pen" className="text-accent" /><h3>무엇을 기록하면 좋을까요?</h3><p>오래 고민했던 오류의 해결 과정,<br />직접 써본 도구의 장단점,<br />그리고 오늘의 새로운 발견.</p></div>
           <p className="aside-caption">서로의 경험을 존중하며<br />함께 성장하는 개발 문화를 만듭니다.</p>
         </aside>

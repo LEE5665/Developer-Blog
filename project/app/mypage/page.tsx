@@ -1,3 +1,4 @@
+import { UserName } from "@/app/components/UserName";
 import Link from "next/link";
 import { Avatar } from "@/app/components/Avatar";
 import { LikedPosts } from "./LikedPosts";
@@ -7,7 +8,6 @@ import prisma from "@/lib/prisma";
 import { MyPageTabs } from "./MyPageTabs";
 import { blogData } from "@/lib/blog-data";
 import { BlogExplorer } from "@/app/components/BlogExplorer";
-
 export default async function MyPage({ searchParams }: { searchParams: Promise<{ tab?: string; post?: string; category?: string; page?: string }> }) {
   const session = await auth();
   if (!session?.user?.id) {
@@ -60,18 +60,13 @@ export default async function MyPage({ searchParams }: { searchParams: Promise<{
         {/* 상단 프로필 요약 카드 */}
         <div className="profile-summary p-6 sm:p-7 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div className="flex items-center gap-4 min-w-0">
-            <Avatar src={user.image} name={user.name} size={56} />
+            <Avatar src={user.image} name={user.nickname} size={56} />
 
             <div>
               <div className="flex flex-wrap items-center gap-2">
                 <h2 className="text-xl sm:text-2xl font-semibold text-zinc-900 dark:text-white">
-                  {user.name || "개발자"}
+                  <UserName user={user} />
                 </h2>
-                {user.nickname && (
-                  <span className="font-mono text-xs sm:text-sm font-semibold bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-md text-zinc-600 dark:text-zinc-300">
-                    {user.nickname}#{user.tag}
-                  </span>
-                )}
               </div>
               <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
                 {user.email}

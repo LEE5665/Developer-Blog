@@ -26,7 +26,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     } else {
       const user = await prisma.user.findUnique({ where: { id: userId }, select: { name: true, nickname: true } });
       if (!user) throw new PostError("다시 로그인해주세요.", 401);
-      nickname = user.nickname || user.name || "개발자";
+      nickname = user.nickname || "개발자";
     }
     const recipients = [...new Set([post.authorId, parent?.authorId].filter((recipient): recipient is string => !!recipient && recipient !== userId))];
     const comment = await prisma.comment.create({ data: { postId: id, parentId, authorId: anonymous ? null : userId, anonymous, nickname, passwordHash, content,

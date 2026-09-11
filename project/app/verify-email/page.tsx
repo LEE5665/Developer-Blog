@@ -50,7 +50,7 @@ export default async function VerifyEmailPage({ searchParams }: VerifyEmailProps
               이메일 인증 및 가입 완료!
             </h1>
             <p className="text-sm text-zinc-600 dark:text-zinc-300 mb-6">
-              <strong className="text-zinc-900 dark:text-white font-mono">{result.user.name}</strong> 님, 환영합니다!<br />
+              <strong className="text-zinc-900 dark:text-white font-mono">{result.user.nickname || "개발자"}</strong> 님, 환영합니다!<br />
               이제 블로그에 로그인하실 수 있습니다.
             </p>
             <Link

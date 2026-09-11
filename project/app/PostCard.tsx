@@ -1,3 +1,4 @@
+import { UserName } from "@/app/components/UserName";
 import Link from "next/link";
 import { Avatar } from "./components/Avatar";
 import { Icon } from "./components/Icon";
@@ -29,9 +30,9 @@ export function PostCard({ post, currentUserId, rank, views, href }: { post: Pos
     </Link>
     <div className="post-author">
       <div className="feed-byline">
-        <Avatar src={post.author.image} name={post.author.name} size={28} />
+        <Avatar src={post.author.image} name={post.author.nickname} size={28} />
         <div className="feed-author-details">
-          <Link href={`/blog/${post.authorId}`}><strong>{post.author.name || "개발자"}</strong></Link>
+          <Link href={`/blog/${post.authorId}`}><strong><UserName user={post.author} /></strong></Link>
           <time dateTime={post.createdAt}>{new Date(post.createdAt).toLocaleDateString("ko-KR", { year: "numeric", month: "short", day: "numeric", timeZone: "Asia/Seoul" })}</time>
         </div>
       </div>

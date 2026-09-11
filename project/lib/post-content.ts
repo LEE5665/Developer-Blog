@@ -47,7 +47,13 @@ export function safeWidth(value: unknown): string | null {
   return null;
 }
 
-const types = new Set(["doc", "paragraph", "heading", "text", "bulletList", "orderedList", "listItem", "blockquote", "codeBlock", "horizontalRule", "hardBreak", "image"]);
+export function imageGroupWidths(value: unknown, count: number): number[] {
+  const widths = typeof value === "string" ? value.split(",").map(Number) : [];
+  if (widths.length !== count || widths.some(w => !Number.isFinite(w) || w < 15 || w > 85) || Math.abs(widths.reduce((a, b) => a + b, 0) - 100) > 0.1) return Array(count).fill(100 / count);
+  return widths;
+}
+
+const types = new Set(["doc", "paragraph", "heading", "text", "bulletList", "orderedList", "listItem", "blockquote", "codeBlock", "horizontalRule", "hardBreak", "image", "imageGroup"]);
 const markTypes = new Set(["bold", "italic", "underline", "strike", "code", "link", "textStyle", "highlight"]);
 
 // Both the API and the React renderer use the same bounded, allowlisted format.
@@ -91,6 +97,10 @@ export function normalizeDocument(input: unknown, allowLegacyImages = false): Po
       });
     }
     if (Array.isArray(node.content)) result.content = node.content.map((child) => visit(child, depth + 1));
+    if (node.type === "imageGroup") {
+      if (!result.content || result.content.length < 2 || result.content.length > 3 || result.content.some(child => child.type !== "image")) throw new Error("이미지 묶음에는 사진 2~3장이 필요합니다.");
+      result.attrs = { widths: imageGroupWidths(attrs.widths, result.content.length).join(",") };
+    }
     return result;
   }
   const doc = visit(input, 0);

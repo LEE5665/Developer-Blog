@@ -1,4 +1,6 @@
 "use client";
+import { UserName } from "@/app/components/UserName";
+
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -6,8 +8,8 @@ import { useRouter } from "next/navigation";
 import { Avatar } from "./Avatar";
 
 type Inbox = {
-  requests: { id: string; createdAt: string; user: { id: string; name: string | null; nickname: string | null; image: string | null } }[];
-  comments: { id: string; createdAt: string; comment: { id: string; parentId: string | null; nickname: string; content: string; post: { id: string; title: string } } }[];
+  requests: { id: string; createdAt: string; user: { id: string; name: string | null; nickname: string | null; tag?: string | null; image: string | null } }[];
+  comments: { id: string; createdAt: string; comment: { id: string; parentId: string | null; nickname: string; tag?: string | null; content: string; post: { id: string; title: string } } }[];
 };
 export function Notifications() {
   const router = useRouter();
@@ -88,7 +90,7 @@ export function Notifications() {
         {!!data?.requests.length && <section aria-label="친구 요청" className="notification-requests">
           <h3>친구 요청 <span>{data.requests.length}</span></h3>
           {data.requests.map((request) => <article key={request.id} className="notification-item">
-            <Link href={`/blog/${request.user.id}`} className="notification-person" onClick={() => setOpen(false)}><Avatar src={request.user.image} name={request.user.name} size={32} /><strong>{request.user.nickname || request.user.name || "개발자"}</strong></Link>
+            <Link href={`/blog/${request.user.id}`} className="notification-person" onClick={() => setOpen(false)}><Avatar src={request.user.image} name={request.user.nickname} size={32} /><strong><UserName user={request.user} /></strong></Link>
             <p>친구 요청을 보냈습니다.</p>
             <div className="notification-actions"><button type="button" className="button button-primary" disabled={busy} onClick={() => void mutate(`/api/friend-requests/${request.id}`, "PATCH", { action: "accept" })}>수락</button><button type="button" className="button button-secondary" disabled={busy} onClick={() => void mutate(`/api/friend-requests/${request.id}`, "PATCH", { action: "reject" })}>거절</button></div>
           </article>)}
@@ -97,7 +99,7 @@ export function Notifications() {
           <div className="notification-heading"><h3>댓글 알림</h3><button type="button" className="text-link" disabled={busy || !data?.comments.length} onClick={() => void mutate("/api/notifications", "DELETE", { all: true })}>전체 삭제</button></div>
           {data?.comments.map((notification) => <article key={notification.id} className="notification-item">
             <Link href={`/posts/${notification.comment.post.id}#comments`} onClick={() => setOpen(false)}>
-              <p><strong>{notification.comment.nickname}</strong>님이 {notification.comment.parentId ? "답글" : "댓글"}을 남겼습니다.</p>
+              <p><strong><UserName user={notification.comment} /></strong>님이 {notification.comment.parentId ? "답글" : "댓글"}을 남겼습니다.</p>
             </Link>
             <p className="notification-post-title">{notification.comment.post.title}</p>
             <p className="line-clamp-2">{notification.comment.content}</p>
