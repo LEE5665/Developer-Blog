@@ -237,7 +237,7 @@ export function TodoCalendar() {
       {/* 캘린더 + Todo 패널 2단 레이아웃 */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* 왼쪽: 캘린더 본체 (7/12) */}
-        <div className="lg:col-span-7 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-5 sm:p-6 shadow-xs">
+        <div className="calendar-panel min-w-0 lg:col-span-7 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-5 sm:p-6 shadow-xs">
           {/* 달력 상단 네비게이션 */}
           <div className="flex items-center justify-between mb-5">
             <h3 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white font-mono">
@@ -275,7 +275,7 @@ export function TodoCalendar() {
           </div>
 
           {/* 달력 일자 그리드 */}
-          <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
+          <div className="calendar-grid grid grid-cols-7 gap-1 sm:gap-1.5">
             {allCalendarDays.map((cell, idx) => {
               if (!cell.isCurrentMonth) {
                 return (
@@ -307,7 +307,7 @@ export function TodoCalendar() {
                       : "border-transparent hover:bg-zinc-100/70 dark:hover:bg-zinc-800/60"
                   }`}
                 >
-                  <div className="flex items-center justify-between w-full">
+                  <div className="calendar-day-heading flex items-center justify-between w-full">
                     <span
                       className={`text-xs sm:text-sm font-bold ${
                         dayOfWeek === 0
@@ -320,7 +320,7 @@ export function TodoCalendar() {
                       {cell.day}
                     </span>
                     {isToday && (
-                      <span className="text-[10px] bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 px-1.5 py-0.2 rounded-md font-semibold">
+                      <span className="calendar-today text-[10px] px-1.5 rounded-md font-semibold" aria-hidden="true">
                         오늘
                       </span>
                     )}
@@ -351,7 +351,7 @@ export function TodoCalendar() {
         </div>
 
         {/* 오른쪽: 선택된 일자 Todo 리스트 (5/12) */}
-        <div className="lg:col-span-5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-5 sm:p-6 shadow-xs space-y-5">
+        <div className="min-w-0 lg:col-span-5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-5 sm:p-6 shadow-xs space-y-5">
           {/* 선택 날짜 헤더 */}
           <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-3">
             <div>
