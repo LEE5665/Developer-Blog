@@ -2,6 +2,14 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+Password recovery is available at `/forgot-password` from the login page. Configure
+`EMAIL_SERVER_USER` and `EMAIL_SERVER_PASSWORD` with the existing Gmail SMTP account,
+and set `AUTH_URL` (or `NEXTAUTH_URL`) to the public site URL in production.
+Reset links expire after 30 minutes, are stored as SHA-256 hashes, and are consumed
+atomically with the password update. Changing the password invalidates all outstanding
+reset links. Requests are rate limited using the existing `ActionLimit` table.
+Google-only accounts should sign in with Google. No database migration is required.
+
 First, run the development server:
 
 ```bash

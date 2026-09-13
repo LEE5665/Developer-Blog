@@ -123,6 +123,12 @@ export default function LoginPage() {
           </button>
         </form>
 
+        <div className="text-center mt-5 text-sm">
+          <Link href="/forgot-password" className="text-zinc-500 dark:text-zinc-400 underline underline-offset-4 hover:opacity-80">
+            비밀번호를 잊으셨나요?
+          </Link>
+        </div>
+
         {/* 회원가입 링크 */}
         <div className="text-center mt-6 text-sm text-zinc-500 dark:text-zinc-400">
           계정이 없으신가요?{" "}

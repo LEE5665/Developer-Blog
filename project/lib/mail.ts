@@ -9,6 +9,20 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+export async function sendPasswordResetEmail(email: string, token: string) {
+  const baseUrl = process.env.AUTH_URL || process.env.NEXTAUTH_URL;
+  if (!baseUrl && process.env.NODE_ENV === "production") throw new Error("AUTH_URL is required");
+  if (!process.env.EMAIL_SERVER_USER || !process.env.EMAIL_SERVER_PASSWORD) throw new Error("SMTP is required");
+  const link = new URL("/reset-password", baseUrl || "http://localhost:3000");
+  link.searchParams.set("token", token);
+  await transporter.sendMail({
+    from: `"Developer Blog" <${process.env.EMAIL_SERVER_USER}>`,
+    to: email,
+    subject: "[Developer Blog] 비밀번호 재설정",
+    text: `아래 링크에서 새 비밀번호를 설정해주세요. 링크는 30분 동안 한 번만 사용할 수 있습니다.\n\n${link.toString()}\n\n본인이 요청하지 않았다면 이 메일을 무시해주세요.`,
+  });
+}
+
 export async function sendVerificationEmail(email: string, token: string) {
   const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
   const confirmLink = `${baseUrl}/verify-email?token=${token}`;
