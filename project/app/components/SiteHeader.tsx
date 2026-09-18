@@ -6,7 +6,6 @@ import { Icon } from "./Icon";
 import { RealtimeEvents } from "./RealtimeEvents";
 import { Chat } from "./Chat";
 import { Notifications } from "./Notifications";
-import { HeaderMenu } from "./HeaderMenu";
 
 export async function SiteHeader() {
   const session = await auth();
@@ -23,11 +22,6 @@ export async function SiteHeader() {
               <RealtimeEvents />
               <Chat userId={session.user.id!} />
               <Notifications />
-            </>
-          ) : null}
-          <HeaderMenu>
-          {session?.user ? (
-            <>
               <Link href="/mypage" className="nav-link">마이페이지</Link>
               <Link href="/write" className="button button-primary header-write"><Icon name="pen" width={16} height={16} />글쓰기</Link>
               <form action={logoutAction}><button type="submit" className="nav-link">로그아웃</button></form>
@@ -36,7 +30,6 @@ export async function SiteHeader() {
             <><Link href="/login" className="nav-link">로그인</Link><Link href="/signup" className="button button-primary">시작하기</Link></>
           )}
           <ThemeToggle />
-          </HeaderMenu>
         </nav>
       </div>
     </header>

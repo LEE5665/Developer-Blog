@@ -107,7 +107,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={isPending}
-            className="auth-submit w-full mt-2 py-2.5 px-4 rounded-xl font-medium text-sm hover:opacity-90 disabled:opacity-50 transition shadow-sm flex items-center justify-center gap-2"
+            className="w-full mt-2 py-2.5 px-4 rounded-xl bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 font-medium text-sm hover:opacity-90 disabled:opacity-50 transition shadow-sm flex items-center justify-center gap-2"
           >
             {isPending ? (
               <>

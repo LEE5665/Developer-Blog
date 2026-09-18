@@ -41,7 +41,7 @@ export function PasswordResetForm({ token }: { token?: string }) {
               <label htmlFor="reset-email" className="block mb-1.5">이메일 주소</label>
               <input id="reset-email" name="email" type="email" autoComplete="email" placeholder="developer@example.com" maxLength={254} required className={inputClass} />
             </div>}
-            <button type="submit" disabled={pending} className="auth-submit w-full rounded-xl px-4 py-2.5 text-sm font-medium hover:opacity-90 disabled:opacity-50">
+            <button type="submit" disabled={pending} className="w-full rounded-xl bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white dark:bg-white dark:text-zinc-900 hover:opacity-90 disabled:opacity-50">
               {pending ? "처리 중..." : resetting ? "비밀번호 변경" : "재설정 링크 보내기"}
             </button>
           </form>
