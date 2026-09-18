@@ -18,6 +18,7 @@ import { Modal } from "@/app/components/Modal";
 import { PostContent } from "@/app/components/PostContent";
 import { documentOutline, hasDocumentContent, normalizeDocument, readDocument, safeImage, safeLink, serializeDocument } from "@/lib/post-content";
 import { EditorToolbar } from "./EditorToolbar";
+import { parseClipboardText } from "./clipboard-text";
 
 type Visibility = "PUBLIC" | "FRIENDS" | "PRIVATE";
 interface CategoryOption { id: string; name: string; isDivider: boolean }
@@ -75,7 +76,7 @@ export function WriteForm({ categories, userId, initialPost }: { categories: Cat
     ],
     immediatelyRender: false,
     content: initialDocument,
-    editorProps: { handlePaste: (_view, event) => {
+    editorProps: { clipboardTextParser: parseClipboardText, handlePaste: (_view, event) => {
       const files = Array.from(event.clipboardData?.items || []).filter(item => item.kind === "file" && item.type.startsWith("image/")).map(item => item.getAsFile()).filter((file): file is File => !!file);
       if (!files.length) return false;
       event.preventDefault(); pasteUpload.current(files); return true;
