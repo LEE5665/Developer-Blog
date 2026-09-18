@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
 :root {
+  --post-content-width: 855px;
   color-scheme: light;
   --background: #f7f8fa; --foreground: #202631; --surface: #fff; --subtle: #f0f2f5;
   --muted: #697386; --line: #e3e7ed; --accent: #315ce7; --accent-soft: #edf1ff; --header: #ffffffeb;
@@ -226,7 +227,7 @@
 .composer-toolbar button:hover { background: var(--subtle); color: var(--foreground); }.composer-toolbar button[aria-pressed="true"] { color: var(--accent); background: var(--accent-soft); }
 .composer-toolbar button:disabled { opacity: .3; }.composer-toolbar select { min-height: 32px; padding: 4px 26px 4px 10px; background: var(--surface); color: var(--foreground); border: 1px solid var(--line); border-radius: 6px; font-size: 12px; cursor: pointer; transition: all .15s ease; }.composer-toolbar select:hover { background: var(--subtle); border-color: var(--muted); }
 .composer-sheet { flex: 1; padding: 40px 24px 60px; background: var(--background); }
-.composer-paper { width: 100%; max-width: 920px; margin: auto; padding: 52px 72px 64px; background: var(--surface); border: 1px solid var(--line); min-height: 690px; }
+.composer-paper { width: 100%; max-width: calc(var(--post-content-width) + 144px + 2px); margin: auto; padding: 52px 72px 64px; background: var(--surface); border: 1px solid var(--line); min-height: 690px; }
 .composer-category { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; margin-bottom: 22px; }.composer-category select { min-height: 32px; padding: 4px 28px 4px 10px; background: var(--surface); color: var(--foreground); border: 1px solid var(--line); border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all .15s ease; max-width: 100%; }.composer-category select:hover { background: var(--subtle); border-color: var(--muted); }
 .composer-title { border: 0; background: transparent; width: 100%; padding: 6px 0; font-size: clamp(26px, 3vw, 38px); font-weight: 550; letter-spacing: -1.5px; outline-offset: 6px; }
 .composer-title::placeholder { color: var(--muted); opacity: .55; }
@@ -239,6 +240,9 @@
 .editor-modal { color: var(--foreground); background: var(--surface); width: min(500px, calc(100% - 32px)); max-height: calc(100svh - 48px); border: 1px solid var(--line); border-radius: 14px; margin: auto; padding: 0; box-shadow: 0 24px 100px #00000030; }.editor-modal::backdrop { background: #080b1266; backdrop-filter: blur(4px); }.editor-modal-wide { width: min(900px, calc(100% - 32px)); }
 .modal-heading { position: sticky; top: 0; z-index: 1; display: flex; align-items: center; justify-content: space-between; padding: 22px 28px; background: var(--surface); border-bottom: 1px solid var(--line); }.modal-heading h2 { font-weight: 650; font-size: 16px; }.modal-heading button { padding: 6px; color: var(--muted); }
 .modal-form { display: grid; gap: 12px; padding: 28px; }.modal-form label, .modal-form legend { font-size: 12px; font-weight: 550; }.modal-form > input, .modal-form > select { width: 100%; background: var(--background); color: var(--foreground); border: 1px solid var(--line); padding: 10px 12px; border-radius: 7px; font-size: 13px; }.modal-form > label:not(:first-child) { margin-top: 8px; }.modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; padding-top: 20px; border-top: 1px solid var(--line); }
+/* Include horizontal padding and dialog borders outside the shared body width. */
+.editor-modal-wide { width: min(calc(var(--post-content-width) + 128px + 2px), calc(100% - 32px)); }
+.composer-body, .composer-preview > .rich-prose, .blog-reading > article > .rich-prose { width: 100%; max-width: var(--post-content-width); }
 .composer-preview { padding: 44px 64px; }.composer-preview > h1 { font-size: 32px; font-weight: 600; line-height: 1.5; margin: 20px 0 36px; padding-bottom: 30px; border-bottom: 1px solid var(--line); overflow-wrap: anywhere; }
 .publish-summary { display: grid; gap: 8px; padding: 16px; background: var(--subtle); border-radius: 8px; margin-bottom: 12px; }.publish-summary span { font-size: 10px; color: var(--muted); }.publish-summary strong { font-size: 16px; font-weight: 550; overflow-wrap: anywhere; }
 .publish-visibility { display: grid; gap: 8px; margin-top: 12px; }.publish-visibility label { padding: 13px 16px; display: flex; align-items: center; gap: 12px; border: 1px solid var(--line); border-radius: 8px; cursor: pointer; }.publish-visibility label.selected { border-color: var(--accent); background: var(--accent-soft); }.publish-visibility input { accent-color: var(--accent); }.publish-visibility svg { color: var(--muted); }.publish-visibility strong { font-size: 12px; font-weight: 550; display: block; }.publish-visibility small { display: block; margin-top: 4px; color: var(--muted); font-size: 10px; }
