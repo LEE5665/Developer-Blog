@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { EditorContent, useEditor, useEditorState, type JSONContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { ImageGroup } from "./ImageGroup";
@@ -30,7 +30,8 @@ export function WriteForm({ categories, userId, initialPost }: { categories: Cat
   const router = useRouter();
   const draftKey = initialPost?.id || "new";
   const storageKey = `developer-blog-draft:${userId}${initialPost ? ":" + initialPost.id : ""}`;
-  const initialDocument = initialPost ? readDocument(initialPost.content) || { type: "doc", content: initialPost.content.split("\n").map((text) => ({ type: "paragraph", content: text ? [{ type: "text", text }] : [] })) } : emptyDocument;
+  const initialContent = initialPost?.content;
+  const initialDocument = useMemo(() => initialContent !== undefined ? readDocument(initialContent) || { type: "doc", content: initialContent.split("\n").map((text) => ({ type: "paragraph", content: text ? [{ type: "text", text }] : [] })) } : emptyDocument, [initialContent]);
   const [showToc, setShowToc] = useState(initialPost ? readDocument(initialPost.content)?.attrs?.toc !== "hidden" : true);
   const [tocDepth, setTocDepth] = useState(Number(initialPost ? readDocument(initialPost.content)?.attrs?.tocDepth || 4 : 4));
   const [tags, setTags] = useState<string[]>(initialPost?.tags || []);
@@ -65,22 +66,25 @@ export function WriteForm({ categories, userId, initialPost }: { categories: Cat
   const published = useRef(false);
   const fileInput = useRef<HTMLInputElement>(null);
   const titleInput = useRef<HTMLInputElement>(null);
-  const editor = useEditor({
-    extensions: [
+  // Stable options avoid reapplying the editor view's props on every keystroke.
+  const extensions = useMemo(() => [
       StarterKit.configure({ heading: { levels: [2, 3, 4] }, link: { openOnClick: false, defaultProtocol: "https", protocols: ["http", "https", "mailto"] } }),
       TextStyle, FontSize, Highlight.configure({ multicolor: true }),
       Placeholder.configure({ placeholder: "이곳에 당신의 이야기를 들려주세요." }),
       ImageGroup, ImageUpload,
       ResizableImage.configure({ allowBase64: false }),
       TextAlign.configure({ types: ["heading", "paragraph"] }),
-    ],
+    ], []);
+  const editorProps = useMemo<NonNullable<Parameters<typeof useEditor>[0]>["editorProps"]>(() => ({ clipboardTextParser: parseClipboardText, handlePaste: (_view, event) => {
+    const files = Array.from(event.clipboardData?.items || []).filter(item => item.kind === "file" && item.type.startsWith("image/")).map(item => item.getAsFile()).filter((file): file is File => !!file);
+    if (!files.length) return false;
+    event.preventDefault(); pasteUpload.current(files); return true;
+  }, attributes: { class: "rich-prose composer-body", role: "textbox", "aria-label": "글 본문", "aria-multiline": "true" } }), []);
+  const editor = useEditor({
+    extensions,
     immediatelyRender: false,
     content: initialDocument,
-    editorProps: { clipboardTextParser: parseClipboardText, handlePaste: (_view, event) => {
-      const files = Array.from(event.clipboardData?.items || []).filter(item => item.kind === "file" && item.type.startsWith("image/")).map(item => item.getAsFile()).filter((file): file is File => !!file);
-      if (!files.length) return false;
-      event.preventDefault(); pasteUpload.current(files); return true;
-    }, attributes: { class: "rich-prose composer-body", role: "textbox", "aria-label": "글 본문", "aria-multiline": "true" } },
+    editorProps,
     onUpdate: () => { dirty.current = true; revisionRef.current += 1; setRevision((value) => value + 1); },
   });
   // Keep toolbar state in sync with the caret and undo history, not just typing.
@@ -142,7 +146,7 @@ export function WriteForm({ categories, userId, initialPost }: { categories: Cat
 
   useEffect(() => {
     if (!dirty.current || storedDraft || !draftReady) return;
-    const timer = window.setTimeout(() => void saveDraft(), 1200);
+    const timer = window.setTimeout(() => void saveDraft(), 20_000);
     return () => window.clearTimeout(timer);
   }, [revision, saveDraft, storedDraft, draftReady]);
 
