@@ -1,7 +1,7 @@
 "use client";
 
 import { FONT_SIZES, HIGHLIGHT_COLORS } from "@/lib/post-content";
-import type { Editor } from "@tiptap/react";
+import { useEditorState, type Editor } from "@tiptap/react";
 import { Icon } from "@/app/components/Icon";
 
 const HIGHLIGHT_NAMES: Record<string, string> = {
@@ -23,6 +23,7 @@ interface Props {
 }
 
 export function EditorToolbar({ editor, onLink, onImage }: Props) {
+  useEditorState({ editor, selector: ({ editor }) => editor?.state });
   function tool(label: string, text: React.ReactNode, action: () => void, active = false, disabled = false) {
     return <button type="button" title={label} aria-label={label} aria-pressed={active} disabled={!editor || disabled} onMouseDown={(event) => event.preventDefault()} onClick={action}>{text}</button>;
   }

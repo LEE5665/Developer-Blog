@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { EditorContent, useEditor, useEditorState, type JSONContent } from "@tiptap/react";
+import { EditorContent, useEditor, useEditorState, type Editor, type JSONContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { ImageGroup } from "./ImageGroup";
 import { ImageUpload, uploadKey } from "./ImageUpload";
@@ -26,6 +26,44 @@ interface Draft { tags: string[]; title: string; doc: JSONContent; categoryId: s
 interface EditablePost { tags: string[]; id: string; title: string; content: string; categoryId: string | null; visibility: Visibility; updatedAt: string }
 const emptyDocument: JSONContent = { type: "doc", content: [{ type: "paragraph" }] };
 
+function ComposerWordCount({ editor }: { editor: Editor | null }) {
+  const count = useEditorState({ editor, selector: ({ editor }) => editor?.getText().length || 0 });
+  return <span className="composer-word-count">{(count || 0).toLocaleString()}자</span>;
+}
+
+function EditorOutlinePreview({ editor, showToc, tocDepth }: { editor: Editor | null; showToc: boolean; tocDepth: number }) {
+  const outline = useEditorState({
+    editor,
+    selector: ({ editor }) => (editor && showToc ? documentOutline(editor.getJSON(), "editor", tocDepth) : []),
+  }) ?? [];
+  if (!showToc) return null;
+  return (
+    <details className="editor-outline">
+      <summary>목차 미리보기 · {outline.length}개 제목</summary>
+      <ol>
+        {outline.map((item) => (
+          <li key={item.id} style={{ paddingLeft: (item.level - 2) * 12 }}>
+            <button
+              type="button"
+              onClick={() => {
+                let index = 0;
+                editor?.state.doc.descendants((node, position) => {
+                  if (node.type.name === "heading" && ++index === item.index) {
+                    editor.chain().focus().setTextSelection(position + 1).scrollIntoView().run();
+                  }
+                });
+              }}
+            >
+              {item.text}
+            </button>
+          </li>
+        ))}
+      </ol>
+      <p>목차의 제목을 누르면 해당 위치를 편집할 수 있습니다.</p>
+    </details>
+  );
+}
+
 export function WriteForm({ categories, userId, initialPost }: { categories: CategoryOption[]; userId: string; initialPost?: EditablePost }) {
   const router = useRouter();
   const draftKey = initialPost?.id || "new";
@@ -44,7 +82,6 @@ export function WriteForm({ categories, userId, initialPost }: { categories: Cat
   const [storedDraft, setStoredDraft] = useState<Draft | null>(null);
   const [draftPromptOpen, setDraftPromptOpen] = useState(false);
   const [draftReady, setDraftReady] = useState(false);
-  const [revision, setRevision] = useState(0);
   const [focusMode, setFocusMode] = useState(false);
   const [publishOpen, setPublishOpen] = useState(false);
   const [previewContent, setPreviewContent] = useState<string | null>(null);
@@ -59,6 +96,8 @@ export function WriteForm({ categories, userId, initialPost }: { categories: Cat
   const pasteUpload = useRef<(files: File[]) => void>(() => {});
   const dirty = useRef(false);
   const revisionRef = useRef(0);
+  const autoSaveTimer = useRef<number | null>(null);
+  const scheduleAutoSaveRef = useRef<() => void>(() => {});
   const draftVersion = useRef<number | null>(null);
   const pendingSave = useRef<Promise<boolean>>(Promise.resolve(true));
   const savingPaused = useRef(false);
@@ -85,10 +124,8 @@ export function WriteForm({ categories, userId, initialPost }: { categories: Cat
     immediatelyRender: false,
     content: initialDocument,
     editorProps,
-    onUpdate: () => { dirty.current = true; revisionRef.current += 1; setRevision((value) => value + 1); },
+    onUpdate: () => { dirty.current = true; revisionRef.current += 1; scheduleAutoSaveRef.current(); },
   });
-  // Keep toolbar state in sync with the caret and undo history, not just typing.
-  const editorState = useEditorState({ editor, selector: ({ editor }) => ({ transaction: editor?.state, count: editor?.getText().length || 0 }) });
 
   useEffect(() => {
     let cancelled = false;
@@ -144,11 +181,21 @@ export function WriteForm({ categories, userId, initialPost }: { categories: Cat
     return pendingSave.current;
   }, [editor, draftReady, storedDraft, title, categoryId, visibility, storageKey, draftKey, showToc, tocDepth, tags]);
 
+  const scheduleAutoSave = useCallback(() => {
+    if (autoSaveTimer.current) window.clearTimeout(autoSaveTimer.current);
+    if (storedDraft || !draftReady) return;
+    autoSaveTimer.current = window.setTimeout(() => void saveDraft(), 20_000);
+  }, [saveDraft, storedDraft, draftReady]);
+
   useEffect(() => {
-    if (!dirty.current || storedDraft || !draftReady) return;
-    const timer = window.setTimeout(() => void saveDraft(), 20_000);
-    return () => window.clearTimeout(timer);
-  }, [revision, saveDraft, storedDraft, draftReady]);
+    scheduleAutoSaveRef.current = scheduleAutoSave;
+  }, [scheduleAutoSave]);
+
+  useEffect(() => {
+    return () => {
+      if (autoSaveTimer.current) window.clearTimeout(autoSaveTimer.current);
+    };
+  }, []);
 
   useEffect(() => {
     const warn = (event: BeforeUnloadEvent) => {
@@ -158,7 +205,7 @@ export function WriteForm({ categories, userId, initialPost }: { categories: Cat
     return () => window.removeEventListener("beforeunload", warn);
   }, []);
 
-  function changed() { dirty.current = true; revisionRef.current += 1; setRevision((value) => value + 1); }
+  function changed() { dirty.current = true; revisionRef.current += 1; scheduleAutoSave(); }
   function restoreDraft() {
     if (!storedDraft || !editor) return;
     setTitle(storedDraft.title);
@@ -288,12 +335,7 @@ export function WriteForm({ categories, userId, initialPost }: { categories: Cat
           <input ref={titleInput} aria-label="글 제목" className="composer-title" placeholder="제목을 입력하세요" value={title} maxLength={200} disabled={!draftReady || !!storedDraft || loading} onChange={(event) => { setTitle(event.target.value); changed(); }} />
           <TagInput tags={tags} disabled={!draftReady || !!storedDraft || loading} onChange={(value) => { setTags(value); changed(); }} />
           <div className="composer-byline">나만의 경험이 담긴 한 편의 글을 완성해보세요.</div>
-          {showToc && <details className="editor-outline"><summary>목차 미리보기 · {documentOutline(editor?.getJSON() || null, "editor", tocDepth).length}개 제목</summary><ol>{documentOutline(editor?.getJSON() || null, "editor", tocDepth).map((item) => <li key={item.id} style={{ paddingLeft: (item.level - 2) * 12 }}><button type="button" onClick={() => {
-            let index = 0;
-            editor?.state.doc.descendants((node, position) => {
-              if (node.type.name === "heading" && ++index === item.index) editor.chain().focus().setTextSelection(position + 1).scrollIntoView().run();
-            });
-          }}>{item.text}</button></li>)}</ol><p>목차의 제목을 누르면 해당 위치를 편집할 수 있습니다.</p></details>}
+          <EditorOutlinePreview editor={editor} showToc={showToc} tocDepth={tocDepth} />
           {error && !publishOpen && <p role="alert" className="composer-error">{error}</p>}
           {imageBusy && <p role="status">이미지를 업로드하고 있습니다…</p>}
           {insertError && !insertMode && <p role="alert" className="composer-error">{insertError}</p>}
@@ -305,7 +347,7 @@ export function WriteForm({ categories, userId, initialPost }: { categories: Cat
         </div>
       </div>
       <div className="composer-bottom-bar">
-        <div className="composer-save-info"><span className="save-dot" /><span role="status">{draftMessage}</span><span className="composer-word-count">{(editorState?.count || 0).toLocaleString()}자</span></div>
+        <div className="composer-save-info"><span className="save-dot" /><span role="status">{draftMessage}</span><ComposerWordCount editor={editor} /></div>
         <div className="composer-actions"><button type="button" className="button button-secondary" disabled={!editor || !draftReady || loading || imageBusy} onClick={() => void discardDraft()}>{initialPost ? "수정 전으로 되돌리기" : "임시 글 삭제"}</button><button type="button" className="button button-secondary" disabled={!editor || !draftReady || !!storedDraft || loading || imageBusy} onClick={() => { try { setPreviewContent(serializeDocument({ ...editor?.getJSON(), attrs: { toc: showToc ? "shown" : "hidden", tocDepth } })); } catch (err) { setError(err instanceof Error ? err.message : "미리보기를 열 수 없습니다."); } }}>미리보기</button><button type="button" className="button button-secondary" disabled={!editor || !draftReady || !!storedDraft || loading || imageBusy} onClick={() => void saveDraft()}>임시저장</button><button type="button" className="button button-accent" disabled={!editor || !draftReady || !!storedDraft || loading || imageBusy} onClick={preparePublish}>완료<Icon name="arrow" width={15} height={15} /></button></div>
       </div>
 
